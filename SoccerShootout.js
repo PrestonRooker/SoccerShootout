@@ -25,6 +25,7 @@ export class SoccerShootout extends Scene {
 
         this.arrow_ang_x = 0
         this.arrow_ang_y = 0
+        this.already_kicked = false
         // this.i = vec4(0,0,1,0)        
 
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
@@ -69,6 +70,16 @@ export class SoccerShootout extends Scene {
         this.key_triggered_button("Kick right", ["n"], () => {
             this.ball.velocity[0] += 10;
         });
+        this.key_triggered_button("Kick", ["m"], () => {
+            if(!this.already_kicked){
+                let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(10);
+                dir_vec[1] = dir_vec[1]*8;
+                this.ball.velocity[0] += dir_vec[0];
+                this.ball.velocity[1] += dir_vec[1];
+                this.ball.velocity[2] += dir_vec[2];
+                this.already_kicked = true
+            }
+        });
     }
 
     display(context, program_state) {
@@ -98,8 +109,12 @@ export class SoccerShootout extends Scene {
 
         let arrow_tr = Mat4.rotation(Math.PI,1,0,0).times(Mat4.identity())
         arrow_tr = Mat4.translation(0,0,-5).times(arrow_tr)
-        arrow_tr = Mat4.rotation(this.arrow_ang_x,0,1,0).times(arrow_tr)
         arrow_tr = Mat4.rotation(this.arrow_ang_y,1,0,0).times(arrow_tr)
+        arrow_tr = Mat4.rotation(this.arrow_ang_x,0,1,0).times(arrow_tr)
+
+        this.arrow_tr = arrow_tr
+        // console.log(this.arrow_tr)
+        // console.log(arrow_tr)
 
         this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
         this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)

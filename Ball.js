@@ -23,6 +23,10 @@ export default class Ball {
                 this.velocity[0] -= Math.min(2 * dt, this.velocity[0]);
             if (this.velocity[0] < 0)
                 this.velocity[0] += Math.min(2 * dt, -this.velocity[0]);
+            if (this.velocity[2] > 0)
+                this.velocity[2] -= Math.min(2 * dt, this.velocity[2]);
+            if (this.velocity[2] < 0)
+                this.velocity[2] += Math.min(2 * dt, -this.velocity[2]);
 
             // Bounce
             this.position[1] = 0;
