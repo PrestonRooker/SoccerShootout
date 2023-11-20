@@ -37,6 +37,8 @@ const Triangle = defs.Triangle =
     }
 
 
+
+
 const Square = defs.Square =
     class Square extends Shape {
         // **Square** demonstrates two triangles that share vertices.  On any planar surface, the
@@ -103,6 +105,50 @@ const Tetrahedron = defs.Tetrahedron =
         }
     }
 
+const Arrow = defs.Arrow = 
+    class Arrow extends Shape {
+        // **Windmill**  As our shapes get more complicated, we begin using matrices and flow
+        // control (including loops) to generate non-trivial point clouds and connect them.
+        constructor() {
+
+                        super("position", "normal", "texture_coord");
+            // First, specify the vertex positions -- the three point locations of an imaginary triangle:
+            this.arrays.position = [vec3(0, 0, 0), vec3(1, 0, 0), vec3(0, 1, 0)];
+            // Next, supply vectors that point away from the triangle face.  They should match up with
+            // the points in the above list.  Normal vectors are needed so the graphics engine can
+            // know if the shape is pointed at light or not, and color it accordingly.
+            this.arrays.normal = [vec3(0, 0, 1), vec3(0, 0, 1), vec3(0, 0, 1)];
+            //  lastly, put each point somewhere in texture space too:
+            this.arrays.texture_coord = [Vector.of(0, 0), Vector.of(1, 0), Vector.of(0, 1)];
+            // Index into our vertices to connect them into a whole triangle:
+            this.indices = [0, 1, 2];
+
+
+            // super("position", "normal", "texture_coord");
+            // // A for loop to automatically generate the triangles:
+            // const triangle = [vec3(0, 0, 0), vec3(1, 0, 0), vec3(0, 1, 0)];
+            // const triangle_normal = [vec3(0, 0, 1), vec3(0, 0, 1), vec3(0, 0, 1)];       // All triangles touch this location -- point 3.
+            // this.arrays.position.push(triangle);
+            // this.arrays.normal.push(triangle_normal)
+
+            const rectangle = Vector3.cast([-1, -1, -2], [1, -1, -2], [-1, 1, -2], [1, 1, -2]);
+            const rectangle_normal = Vector3.cast([0, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 1]);
+            this.arrays.position.push(rectangle);
+            this.arrays.normal.push(rectangle);
+
+
+            // // Rotate our base triangle's normal (0,0,1) to get the new one.  Careful!  Normal vectors are not
+            // // points; their perpendicularity constraint gives them a mathematical quirk that when applying
+            // // matrices you have to apply the transposed inverse of that matrix instead.  But right now we've
+            // // got a pure rotation matrix, where the inverse and transpose operations cancel out, so it's ok.
+            // this.arrays.texture_coord = [Vector.of(0, 0), Vector.of(1, 0), Vector.of(0, 1)];
+            this.indices.push(0, 1, 2, 1, 3, 2);
+            // this.indices = [0,1,2]
+            // Procedurally connect the 3 new vertices into triangles:
+            // this.indices.push(3 * i, 3 * i + 1, 3 * i + 2);
+        }
+    }
+
 const Windmill = defs.Windmill =
     class Windmill extends Shape {
         // **Windmill**  As our shapes get more complicated, we begin using matrices and flow
@@ -151,6 +197,33 @@ const Cube = defs.Cube =
                     // Calling this function of a Square (or any Shape) copies it into the specified
                     // Shape (this one) at the specified matrix offset (square_transform):
                     Square.insert_transformed_copy_into(this, [], square_transform);
+                }
+        }
+    }
+
+    const OpenCube = defs.OpenCube =
+    class OpenCube extends Shape {
+        // **Cube** A closed 3D shape, and the first example of a compound shape (a Shape constructed
+        // out of other Shapes).  A cube inserts six Square strips into its own arrays, using six
+        // different matrices as offsets for each square.
+        constructor() {
+            super("position", "normal", "texture_coord");
+            // Loop 3 times (for each axis), and inside loop twice (for opposing cube sides):
+            for (let i = 0; i < 3; i++)
+                for (let j = 0; j < 2; j++) {
+                    if (i == 0 && j == 1){
+                        //Skip Drawing that face
+                    }
+                    else {
+                        const square_transform = Mat4.rotation(i == 0 ? Math.PI / 2 : 0, 1, 0, 0)
+                        .times(Mat4.rotation(Math.PI * j - (i == 1 ? Math.PI / 2 : 0), 0, 1, 0))
+                        .times(Mat4.translation(0, 0, 1));
+                        // Calling this function of a Square (or any Shape) copies it into the specified
+                        // Shape (this one) at the specified matrix offset (square_transform):
+                        Square.insert_transformed_copy_into(this, [], square_transform);
+
+                    }
+
                 }
         }
     }
