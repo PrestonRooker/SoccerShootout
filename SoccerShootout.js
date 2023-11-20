@@ -4,6 +4,19 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene,
 } = tiny;
 
+const Arrow = defs.Arrow =
+    class Arrow extends Shape {
+        // Combine a cone and cylinder to make an arrow
+        constructor() {
+            super("position", "normal", "texture_coord");
+            // can use .insert_transformed_copy_into to add smaller obj to overall shape
+            defs.Closed_Cone.insert_transformed_copy_into(this,[10,30],
+                Mat4.translation(0,0,2.5).times(Mat4.scale(0.8,0.8,0.8)))
+            defs.Capped_Cylinder.insert_transformed_copy_into(this,[30,30],
+                Mat4.translation(0,0,0.5).times(Mat4.scale(0.4,0.4,2.5)))
+        }
+    }
+
 export class SoccerShootout extends Scene {
     constructor() {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
@@ -13,6 +26,7 @@ export class SoccerShootout extends Scene {
         this.shapes = {
             grass: new defs.Cube(),
             ball: new defs.Subdivision_Sphere(4),
+            arrow: new defs.Arrow(),
         };
 
         // *** Materials
@@ -21,6 +35,8 @@ export class SoccerShootout extends Scene {
                 {ambient: 0.4, diffusivity: 0.8, specularity: 0, color: hex_color("#7CFC00")}),
             ball_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
+            arrow_mat: new Material(new defs.Phong_Shader(),
+                {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("#FF0000")}),
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -55,7 +71,10 @@ export class SoccerShootout extends Scene {
         let S1 = Mat4.scale(50,0.4,50)
         let T1 = Mat4.translation(0,-1.4,0)
         let grass_tr = T1.times(S1.times(Mat4.identity()))
+        
+        let arrow_tr = Mat4.translation(0,0,-5).times(Mat4.rotation(Math.PI,1,0,0)).times(Mat4.identity())
 
+        this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
         this.shapes.ball.draw(context, program_state, Mat4.identity(), this.materials.ball_mat)
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_mat)
 
