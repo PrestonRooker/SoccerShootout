@@ -11,13 +11,16 @@ export class SoccerShootout extends Scene {
 
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
         this.shapes = {
-            cube: new defs.Cube(),
+            grass: new defs.Cube(),
+            ball: new defs.Subdivision_Sphere(4),
         };
 
         // *** Materials
         this.materials = {
-            grass: new Material(new defs.Phong_Shader(),
-                {ambient: .4, diffusivity: .6, color: hex_color("#7CFC00")}),
+            grass_mat: new Material(new defs.Phong_Shader(),
+                {ambient: 0.4, diffusivity: 0.8, specularity: 0, color: hex_color("#7CFC00")}),
+            ball_mat: new Material(new defs.Phong_Shader(),
+                {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -46,10 +49,15 @@ export class SoccerShootout extends Scene {
         
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         
-        const light_position = vec4(0, 10, 0, 1);
-        program_state.lights = [new Light(light_position, hex_color("#ffffff"), 1000)];
+        const light_position = vec4(0, 100, 0, 1);
+        program_state.lights = [new Light(light_position, hex_color("#ffffff"), 10000)];
 
-         this.shapes.cube.draw(context, program_state, Mat4.identity(), this.materials.grass)
+        let S1 = Mat4.scale(50,0.4,50)
+        let T1 = Mat4.translation(0,-1.4,0)
+        let grass_tr = T1.times(S1.times(Mat4.identity()))
+
+        this.shapes.ball.draw(context, program_state, Mat4.identity(), this.materials.ball_mat)
+        this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_mat)
 
     }
 }
