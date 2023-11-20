@@ -22,6 +22,10 @@ export class SoccerShootout extends Scene {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
 
+        this.arrow_ang_x = 0
+        this.arrow_ang_y = 0
+        // this.i = vec4(0,0,1,0)        
+
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
         this.shapes = {
             grass: new defs.Cube(),
@@ -44,9 +48,11 @@ export class SoccerShootout extends Scene {
 
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-        this.key_triggered_button("Soccer", ["ArrowLeft"], () => this.attached = () => null);
+        this.key_triggered_button("Aim Left", ["ArrowLeft"], () => this.arrow_ang_x = Math.min(this.arrow_ang_x + Math.PI/48,Math.PI/2));
+        this.key_triggered_button("Aim Right", ["ArrowRight"], () => this.arrow_ang_x = Math.max(this.arrow_ang_x - Math.PI/48,-Math.PI/2));
         this.new_line();
-        this.key_triggered_button("Shootout", ["ArrowRight"], () => this.attached = () => null);
+        this.key_triggered_button("Aim Up", ["ArrowUp"], () => this.arrow_ang_y = Math.min(this.arrow_ang_y + Math.PI/48,Math.PI/2));
+        this.key_triggered_button("Aim Down", ["ArrowDown"], () => this.arrow_ang_y = Math.max(this.arrow_ang_y - Math.PI/48,0));
         this.new_line();
     }
 
@@ -72,7 +78,10 @@ export class SoccerShootout extends Scene {
         let T1 = Mat4.translation(0,-1.4,0)
         let grass_tr = T1.times(S1.times(Mat4.identity()))
         
-        let arrow_tr = Mat4.translation(0,0,-5).times(Mat4.rotation(Math.PI,1,0,0)).times(Mat4.identity())
+        let arrow_tr = Mat4.rotation(Math.PI,1,0,0).times(Mat4.identity())
+        arrow_tr = Mat4.translation(0,0,-5).times(arrow_tr)
+        arrow_tr = Mat4.rotation(this.arrow_ang_x,0,1,0).times(arrow_tr)
+        arrow_tr = Mat4.rotation(this.arrow_ang_y,1,0,0).times(arrow_tr)
 
         this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
         this.shapes.ball.draw(context, program_state, Mat4.identity(), this.materials.ball_mat)
