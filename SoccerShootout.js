@@ -1,8 +1,9 @@
 import {defs, tiny} from './examples/common.js';
 
 const {
-    Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene,
+    Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
+
 
 export class SoccerShootout extends Scene {
     constructor() {
@@ -21,6 +22,12 @@ export class SoccerShootout extends Scene {
                 {ambient: 0.4, diffusivity: 0.8, specularity: 0, color: hex_color("#7CFC00")}),
             ball_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
+            ball_texture: new Material(new defs.Textured_Phong(),
+                {ambient: 1, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/soccerball.png", "NEAREST")}),
+            grass_texture: new Material(new defs.Textured_Phong(),
+                {ambient: 1, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/grass.jpg", "NEAREST")}),
         }
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -56,8 +63,8 @@ export class SoccerShootout extends Scene {
         let T1 = Mat4.translation(0,-1.4,0)
         let grass_tr = T1.times(S1.times(Mat4.identity()))
 
-        this.shapes.ball.draw(context, program_state, Mat4.identity(), this.materials.ball_mat)
-        this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_mat)
+        this.shapes.ball.draw(context, program_state, Mat4.identity(), this.materials.ball_texture)
+        this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
 
     }
 }
