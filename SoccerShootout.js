@@ -1,20 +1,40 @@
 import {defs, tiny} from './examples/common.js';
+import Ball from './Ball.js';
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
 
+const Arrow = defs.Arrow =
+    class Arrow extends Shape {
+        // Combine a cone and cylinder to make an arrow
+        constructor() {
+            super("position", "normal", "texture_coord");
+            // can use .insert_transformed_copy_into to add smaller obj to overall shape
+            defs.Closed_Cone.insert_transformed_copy_into(this,[10,30],
+                Mat4.translation(0,0,2.5).times(Mat4.scale(0.8,0.8,0.8)))
+            defs.Capped_Cylinder.insert_transformed_copy_into(this,[30,30],
+                Mat4.translation(0,0,0.5).times(Mat4.scale(0.4,0.4,2.5)))
+        }
+    }
 
 export class SoccerShootout extends Scene {
     constructor() {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
 
+        this.arrow_ang_x = 0
+        this.arrow_ang_y = 0
+        // this.i = vec4(0,0,1,0)        
+
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
         this.shapes = {
             grass: new defs.Cube(),
             ball: new defs.Subdivision_Sphere(4),
+            arrow: new defs.Arrow(),
         };
+
+        this.ball = new Ball(vec4(0, 30, 0, 1), 1);
 
         // *** Materials
         this.materials = {
@@ -28,17 +48,27 @@ export class SoccerShootout extends Scene {
             grass_texture: new Material(new defs.Textured_Phong(),
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/grass.jpg", "NEAREST")}),
+            arrow_mat: new Material(new defs.Phong_Shader(),
+                {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("#FF0000")}),
         }
 
-        this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
+        this.initial_camera_location = Mat4.look_at(vec3(0, 5, 50), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-        this.key_triggered_button("Soccer", ["ArrowLeft"], () => this.attached = () => null);
+        this.key_triggered_button("Aim Left", ["ArrowLeft"], () => this.arrow_ang_x = Math.min(this.arrow_ang_x + Math.PI/48,Math.PI/2));
+        this.key_triggered_button("Aim Right", ["ArrowRight"], () => this.arrow_ang_x = Math.max(this.arrow_ang_x - Math.PI/48,-Math.PI/2));
         this.new_line();
-        this.key_triggered_button("Shootout", ["ArrowRight"], () => this.attached = () => null);
+        this.key_triggered_button("Aim Up", ["ArrowUp"], () => this.arrow_ang_y = Math.min(this.arrow_ang_y + Math.PI/48,Math.PI/2));
+        this.key_triggered_button("Aim Down", ["ArrowDown"], () => this.arrow_ang_y = Math.max(this.arrow_ang_y - Math.PI/48,0));
         this.new_line();
+        this.key_triggered_button("Kick left", ["b"], () => {
+            this.ball.velocity[0] -= 10;
+        });
+        this.key_triggered_button("Kick right", ["n"], () => {
+            this.ball.velocity[0] += 10;
+        });
     }
 
     display(context, program_state) {
@@ -62,8 +92,17 @@ export class SoccerShootout extends Scene {
         let S1 = Mat4.scale(50,0.4,50)
         let T1 = Mat4.translation(0,-1.4,0)
         let grass_tr = T1.times(S1.times(Mat4.identity()))
+        
+        this.ball.update(dt);
+        console.log(...this.ball.velocity);
 
-        this.shapes.ball.draw(context, program_state, Mat4.identity(), this.materials.ball_texture)
+        let arrow_tr = Mat4.rotation(Math.PI,1,0,0).times(Mat4.identity())
+        arrow_tr = Mat4.translation(0,0,-5).times(arrow_tr)
+        arrow_tr = Mat4.rotation(this.arrow_ang_x,0,1,0).times(arrow_tr)
+        arrow_tr = Mat4.rotation(this.arrow_ang_y,1,0,0).times(arrow_tr)
+
+        this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
+        this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
 
     }
