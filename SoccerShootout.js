@@ -1,4 +1,5 @@
 import {defs, tiny} from './examples/common.js';
+import Ball from './Ball.js';
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene,
@@ -15,6 +16,8 @@ export class SoccerShootout extends Scene {
             ball: new defs.Subdivision_Sphere(4),
         };
 
+        this.ball = new Ball(vec4(0, 30, 0, 1), 1);
+
         // *** Materials
         this.materials = {
             grass_mat: new Material(new defs.Phong_Shader(),
@@ -23,7 +26,7 @@ export class SoccerShootout extends Scene {
                 {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
         }
 
-        this.initial_camera_location = Mat4.look_at(vec3(0, 10, 20), vec3(0, 0, 0), vec3(0, 1, 0));
+        this.initial_camera_location = Mat4.look_at(vec3(0, 5, 50), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
     make_control_panel() {
@@ -32,6 +35,12 @@ export class SoccerShootout extends Scene {
         this.new_line();
         this.key_triggered_button("Shootout", ["ArrowRight"], () => this.attached = () => null);
         this.new_line();
+        this.key_triggered_button("Kick right", ["B"], () => {
+            this.ball.velocity[0] += 10;
+        });
+        this.key_triggered_button("Kick right", ["N"], () => {
+            this.ball.velocity[0] += 10;
+        });
     }
 
     display(context, program_state) {
@@ -56,7 +65,10 @@ export class SoccerShootout extends Scene {
         let T1 = Mat4.translation(0,-1.4,0)
         let grass_tr = T1.times(S1.times(Mat4.identity()))
 
-        this.shapes.ball.draw(context, program_state, Mat4.identity(), this.materials.ball_mat)
+        this.ball.update(dt);
+        console.log(...this.ball.velocity);
+
+        this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_mat)
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_mat)
 
     }
