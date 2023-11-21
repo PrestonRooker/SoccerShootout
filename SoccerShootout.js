@@ -41,14 +41,14 @@ export class SoccerShootout extends Scene {
         this.materials = {
             grass_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.4, diffusivity: 0.8, specularity: 0, color: hex_color("#7CFC00")}),
+            grass_texture: new Material(new defs.Textured_Phong(),
+                {ambient: 1, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/grass.jpg", "NEAREST")}),
             ball_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
             ball_texture: new Material(new defs.Textured_Phong(),
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/soccerball.png", "NEAREST")}),
-            grass_texture: new Material(new defs.Textured_Phong(),
-                {ambient: 1, diffusivity: 0.1, specularity: 0.1,
-                texture: new Texture("assets/grass.jpg", "NEAREST")}),
             arrow_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("#FF0000")}),
         }
