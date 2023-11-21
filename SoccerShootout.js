@@ -5,6 +5,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
 
+
 const SoccerGoal = defs.SoccerGoal =
     class SoccerGoal extends Shape {
         constructor(net_material, post_material) {
@@ -48,6 +49,29 @@ const Arrow = defs.Arrow =
                 Mat4.translation(0,0,2.5).times(Mat4.scale(0.8,0.8,0.8)))
             defs.Capped_Cylinder.insert_transformed_copy_into(this,[30,30],
                 Mat4.translation(0,0,0.5).times(Mat4.scale(0.4,0.4,2.5)))
+        }
+    }
+
+const Goalie = defs.Goalie = 
+    class Goalie extends Shape{
+        constructor(){
+            super("position","normal","texture_coord");
+            // defs.Closed_Cone.insert_transformed_copy_into(this,[10,30],
+            //     Mat4.translation(0,0,7).times(Mat4.scale(0.8,0.8,0.8)))
+            defs.Capped_Cylinder.insert_transformed_copy_into(this,[30,30],
+                Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)))
+            // Sphere on top of the Cylinder
+            const sphere_scale = Mat4.scale(1, 1, 1); // Adjust the scale as needed
+            const sphere_translation = Mat4.translation(0, 0, 6.6); // Adjust the position above the cylinder
+            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], sphere_translation.times(sphere_scale));
+            // Sphere on the left side of the Cylinder
+            const left_sphere_scale = Mat4.scale(0.5, 0.5, 0.5); // Adjust the scale as needed
+            const left_sphere_translation = Mat4.translation(-1.5, 0, 4); // Adjust the position
+            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], left_sphere_translation.times(left_sphere_scale));
+            // Sphere on the right side of the Cylinder
+            const right_sphere_scale = Mat4.scale(0.5, 0.5, 0.5); // Adjust the scale as needed
+            const right_sphere_translation = Mat4.translation(1.5, 0, 4); // Adjust the position
+            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], right_sphere_translation.times(right_sphere_scale));
         }
     }
 
@@ -96,6 +120,8 @@ export class SoccerShootout extends Scene {
             ball_texture: new Material(new defs.Textured_Phong(),
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/soccerball.png", "NEAREST")}),
+            goalie_mat: new Material(new defs.Phong_Shader(),
+                {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("FCFCFC")}),
             arrow_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("#FF0000")}),
             net_texture: new Material(new defs.Textured_Phong(),
@@ -123,6 +149,7 @@ export class SoccerShootout extends Scene {
             rectangle: new defs.Square(),
             power: new defs.Subdivision_Sphere(4),
             obstacle: new defs.Cube(),
+            goalie: new defs.Goalie(),
         };
 
         this.ball = new Ball(vec4(0, 30, 0, 1), 1);
@@ -208,6 +235,7 @@ export class SoccerShootout extends Scene {
         arrow_tr = Mat4.rotation(this.arrow_ang_y,1,0,0).times(arrow_tr)
         arrow_tr = Mat4.rotation(this.arrow_ang_x,0,1,0).times(arrow_tr)
         this.arrow_tr = arrow_tr
+        // console.log(this.arrow_ang_x)
 
         this.shapes.obstacle.draw(context, program_state, obstacle_transform, this.materials.obstacle);
         this.shapes.obstacle.draw(context, program_state, obstacle_transform2, this.materials.obstacle);
@@ -216,7 +244,7 @@ export class SoccerShootout extends Scene {
         power_tr = Mat4.translation(15, 2, 0).times(power_tr);
 
         this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
-        
+
         this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
         this.shapes.power.draw(context, program_state, power_tr, this.materials.power_mat)
@@ -237,6 +265,12 @@ export class SoccerShootout extends Scene {
         // Use a Square or Rectangle shape for the panel
         this.shapes.net.draw(context, program_state, net_tr, this.materials.net_texture)
         this.shapes.goal.draw(context, program_state, goal_tr, this.materials.post_color)
+
+        //Draw Goalie
+        let goalie_tr = Mat4.translation(0, -3.5, -38).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
+        this.goalie_tr = goalie_tr;
+        this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
+
         
         // let threshold_translation = Mat4.translation(0, 0, -40).times(panel_scale.times(Mat4.identity()))
         // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
