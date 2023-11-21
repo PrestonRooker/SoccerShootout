@@ -15,7 +15,10 @@ export default class Ball {
         // Cap dt to prevent explosions
         if (dt > 0.05)
             dt = 0.05;
-        
+
+        this.velocity = this.velocity.plus(vec4(0, -gravity, 0, 0).times(dt));
+        this.position = this.position.plus(this.velocity.times(dt));
+
         if (this.position[1] < 0)
         {
             // Friction
@@ -32,9 +35,6 @@ export default class Ball {
             this.position[1] = 0;
             this.velocity[1] = this.velocity[1] * -0.5;
         }
-
-        this.velocity = this.velocity.plus(vec4(0, -gravity, 0, 0).times(dt));
-        this.position = this.position.plus(this.velocity.times(dt));
     }
 
     get transform() {

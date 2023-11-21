@@ -72,8 +72,7 @@ export class SoccerShootout extends Scene {
         });
         this.key_triggered_button("Kick", ["m"], () => {
             if(!this.already_kicked){
-                let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(10);
-                dir_vec[1] = dir_vec[1]*8;
+                let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(15);
                 this.ball.velocity[0] += dir_vec[0];
                 this.ball.velocity[1] += dir_vec[1];
                 this.ball.velocity[2] += dir_vec[2];
