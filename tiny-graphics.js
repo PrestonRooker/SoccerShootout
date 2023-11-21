@@ -739,7 +739,7 @@ const Graphics_Card_Object = tiny.Graphics_Card_Object =
             // GPU.  GPU-bound objects should override this function, which builds an
             // initial instance, so as to populate it with finished pointers.
             const existing_instance = this.gpu_instances.get(context);
-
+ 
             // Warn the user if they are avoidably making too many GPU objects.  Beginner
             // WebGL programs typically only need to call copy_onto_graphics_card once
             // per object; doing it more is expensive, so warn them with an "idiot
