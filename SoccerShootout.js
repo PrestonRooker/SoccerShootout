@@ -126,6 +126,13 @@ export class SoccerShootout extends Scene {
                 this.already_kicked = true
             }
         });
+        this.new_line();
+        this.key_triggered_button("Reset ball", ["r"], () => {
+            this.ball.position = vec4(0, 30, 0, 1)
+            this.ball.velocity = vec4(0, 0, 0, 0)
+            this.ball.goal = false
+            this.already_kicked = false
+        })
     }
 
     display(context, program_state) {
@@ -152,41 +159,41 @@ export class SoccerShootout extends Scene {
         let T1 = Mat4.translation(0,-1.4,0)
         let grass_tr = T1.times(S1.times(Mat4.identity()))
 
-        const upright_tilt = Mat4.rotation(Math.PI / 2,1,0,0)
-        let goal_translation = Mat4.translation(0,20,-40).times(upright_tilt)
-        let goal_tr = goal_translation.times(Mat4.identity())
-
-        let a = -2.5
-        let b = 1
-        let w = 1
-
-        // let left_post_translation =  Mat4.translation(0,0,-5);
-        // let left_post_scale = Mat4.scale(0.5,0.5,10)
-        // let left_post_rotation = Mat4.rotation(this.rotation_angle(t, a, b, w), 0, 0, 1)
-        // // let arrow_rotate = Mat4.rotation(this.rotation_angle(t, a, b, w), 0, 0, 1)
-        // let left_post_tr = left_post_scale.times(left_post_translation.times(left_post_rotation.times(Mat4.identity())))
-            
         this.ball.update(dt);
         // console.log(...this.ball.velocity);
-
+        
+        // Transform Arrow:
         let arrow_tr = Mat4.rotation(Math.PI,1,0,0).times(Mat4.identity())
         arrow_tr = Mat4.translation(0,0,-5).times(arrow_tr)
         arrow_tr = Mat4.rotation(this.arrow_ang_y,1,0,0).times(arrow_tr)
         arrow_tr = Mat4.rotation(this.arrow_ang_x,0,1,0).times(arrow_tr)
-
         this.arrow_tr = arrow_tr
+<<<<<<< HEAD
         // console.log(this.arrow_tr)
         // console.log(arrow_tr)
 
         let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
         power_tr = Mat4.translation(15, 2, 0).times(power_tr);
 
+=======
+        
+>>>>>>> 3fab0d566dc4fb691617fcdd2af4f5001d56abf1
         this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
+        
         this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
+<<<<<<< HEAD
         this.shapes.power.draw(context, program_state, power_tr, this.materials.power_mat)
         // this.shapes.aim_arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
         // this.shapes.cylinder.draw(context, program_state, left_post_tr, this.materials.arrow_mat)
+=======
+        
+        // Transform Goal:
+        const upright_tilt = Mat4.rotation(Math.PI / 2,1,0,0)
+        let goal_translation = Mat4.translation(0,20,-40).times(upright_tilt)
+        let goal_tr = goal_translation.times(Mat4.identity())
+            
+>>>>>>> 3fab0d566dc4fb691617fcdd2af4f5001d56abf1
         const panel_width = 80 / 5; // Same as the crossbar length
         const panel_height = 6; // Same as the post height
 
