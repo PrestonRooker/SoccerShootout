@@ -286,7 +286,7 @@ export class SoccerShootout extends Scene {
         // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
 
         // Draw a blue dome around the field
-        let bt = Mat4.rotation(this.arrow_ang_x,0,0,1).times(Mat4.scale(100,100,100)).times(Mat4.identity())
+        let bt = Mat4.scale(100,100,100).times(Mat4.identity())
         this.shapes.ball.draw(context,program_state,bt,this.materials.dome_mat)
     }
 
