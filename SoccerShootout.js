@@ -81,6 +81,8 @@ export class SoccerShootout extends Scene {
             {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
             transparent: new Material(new defs.Phong_Shader(),
             {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF"), }),
+            power_mat: new Material(new defs.Phong_Shader(),
+            {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
         }       
 
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
@@ -91,7 +93,8 @@ export class SoccerShootout extends Scene {
             cylinder: new defs.Capped_Cylinder(30, 30),
             goal: new defs.SoccerGoal(),
             net: new defs.OpenCube(),
-            rectangle: new defs.Square()
+            rectangle: new defs.Square(),
+            power: new defs.Subdivision_Sphere(4)
         };
 
         this.ball = new Ball(vec4(0, 30, 0, 1), 1);
@@ -140,8 +143,10 @@ export class SoccerShootout extends Scene {
         
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         
+        let r = Math.sin((Math.PI/2)*t) + 1;
+
         const light_position = vec4(0, 100, 0, 1);
-        program_state.lights = [new Light(light_position, hex_color("#ffffff"), 10000)];
+        program_state.lights = [new Light(light_position, hex_color("#fdfbd3"), 10000)];
 
         let S1 = Mat4.scale(50,0.4,50)
         let T1 = Mat4.translation(0,-1.4,0)
@@ -173,9 +178,13 @@ export class SoccerShootout extends Scene {
         // console.log(this.arrow_tr)
         // console.log(arrow_tr)
 
+        let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
+        power_tr = Mat4.translation(15, 2, 0).times(power_tr);
+
         this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
         this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
+        this.shapes.power.draw(context, program_state, power_tr, this.materials.power_mat)
         // this.shapes.aim_arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
         // this.shapes.cylinder.draw(context, program_state, left_post_tr, this.materials.arrow_mat)
         const panel_width = 80 / 5; // Same as the crossbar length
