@@ -136,8 +136,9 @@ export class SoccerShootout extends Scene {
             obstacle: new Material(new defs.Phong_Shader(),
                 {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("#0000FF")}),
             wireframe: new Material(new defs.Basic_Shader()),
-            dome_mat : new Material(new defs.Phong_Shader(),
-            {ambient: 0.9, diffusivity: 0.2, specularity: 0.2, color: hex_color("#87CEEB")}),
+            dome_mat : new Material(new defs.Textured_Phong(),
+                {ambient: 1, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/sky12.jpg", "NEAREST")}),
         }       
 
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
@@ -278,7 +279,7 @@ export class SoccerShootout extends Scene {
         // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
 
         // Draw a blue dome around the field
-        let bt = Mat4.scale(100,100,100).times(Mat4.identity())
+        let bt = Mat4.rotation(this.arrow_ang_x,0,0,1).times(Mat4.scale(100,100,100)).times(Mat4.identity())
         this.shapes.ball.draw(context,program_state,bt,this.materials.dome_mat)
     }
 
