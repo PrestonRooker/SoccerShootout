@@ -9,7 +9,7 @@ export default class Ball {
         this.position = initialPosition;
         this.velocity = vec4(0, 0, 0, 0);
         this.radius = 1;
-        this.goal = false
+        this.goal = false;
     }
 
     update(dt, obstacle_transforms) {
@@ -17,7 +17,9 @@ export default class Ball {
         if (dt > 0.05)
             dt = 0.05;
 
-        this.velocity = this.velocity.plus(vec4(0, -gravity, 0, 0).times(dt));
+        if(this.goal==false){
+            this.velocity = this.velocity.plus(vec4(0, -gravity, 0, 0).times(dt));
+        }
         this.position = this.position.plus(this.velocity.times(dt));
 
         if (this.position[1] < 0)
@@ -39,8 +41,11 @@ export default class Ball {
             this.velocity[1] = this.velocity[1] * -0.5;
         }
 
-        if (this.position[0] > -8 && this.position[0] < 8 && this.position[2] < -40 && this.position[2] > -45)
+        if (this.position[0] > -8 && this.position[0] < 8 && this.position[2] < -40 && this.position[2] > -45){
             this.goal = true
+            this.velocity = vec4(0, 0, 0, 0);
+            // this.position = vec4(this.position[0],this.position[1],this.position[2],this.position[3])
+        }
 
         if (this.goal) {
             console.log("GOOOOOAAAAALLLLL")

@@ -140,20 +140,20 @@ export class SoccerShootout extends Scene {
         this.key_triggered_button("Aim Down", ["ArrowDown"], () => this.arrow_ang_y = Math.max(this.arrow_ang_y - Math.PI/48,0));
         this.new_line();
         this.key_triggered_button("Kick left", ["j"], () => {
-            this.ball.velocity[0] -= 10;
+            this.ball.velocity[0] -= 50;
         });
         this.key_triggered_button("Kick right", ["l"], () => {
-            this.ball.velocity[0] += 10;
+            this.ball.velocity[0] += 50;
         });
         this.key_triggered_button("Kick forward", ["i"], () => {
-            this.ball.velocity[2] -= 10;
+            this.ball.velocity[2] -= 50;
         });
         this.key_triggered_button("Kick back", ["k"], () => {
-            this.ball.velocity[2] += 10;
+            this.ball.velocity[2] += 50;
         });
         this.key_triggered_button("Kick", ["m"], () => {
             if(!this.already_kicked){
-                let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(15);
+                let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(50);
                 this.ball.velocity[0] += dir_vec[0];
                 this.ball.velocity[1] += dir_vec[1];
                 this.ball.velocity[2] += dir_vec[2];
