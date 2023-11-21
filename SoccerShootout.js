@@ -95,6 +95,9 @@ export class SoccerShootout extends Scene {
         this.arrow_ang_y = 0
         this.already_kicked = false
         // this.i = vec4(0,0,1,0)
+        this.x_range = [-20, 20]
+        this.y_range = [0, -38]
+        this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1])]
 
         // For collision debugging
         this.wireframes = [
@@ -197,6 +200,7 @@ export class SoccerShootout extends Scene {
             this.ball.velocity = vec4(0, 0, 0, 0)
             this.ball.goal = false
             this.already_kicked = false
+            this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1])]
         })
     }
 
@@ -281,6 +285,8 @@ export class SoccerShootout extends Scene {
         this.goalie_tr = goalie_tr;
         this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
 
+        let defender_tr = Mat4.translation(this.defender_pos[0], -3.5, this.defender_pos[1]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
+        this.shapes.goalie.draw(context, program_state, defender_tr, this.materials.goalie_mat);
         
         // let threshold_translation = Mat4.translation(0, 0, -40).times(panel_scale.times(Mat4.identity()))
         // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
@@ -289,6 +295,12 @@ export class SoccerShootout extends Scene {
         let bt = Mat4.scale(100,100,100).times(Mat4.identity())
         this.shapes.ball.draw(context,program_state,bt,this.materials.dome_mat)
     }
+
+    getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+      }
 
     rotation_angle (t, a, b, w) {
         return a + b * Math.sin(w * t)
