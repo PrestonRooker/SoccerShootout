@@ -9,6 +9,7 @@ export default class Ball {
         this.position = initialPosition;
         this.velocity = vec4(0, 0, 0, 0);
         this.radius = 1;
+        this.goal = false
     }
 
     update(dt) {
@@ -34,6 +35,13 @@ export default class Ball {
             // Bounce
             this.position[1] = 0;
             this.velocity[1] = this.velocity[1] * -0.5;
+        }
+
+        if (this.position[0] > -8 && this.position[0] < 8 && this.position[2] < -40 && this.position[2] > -45)
+            this.goal = true
+
+        if (this.goal) {
+            console.log("GOOOOOAAAAALLLLL")
         }
     }
 
