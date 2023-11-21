@@ -211,7 +211,7 @@ const Cube = defs.Cube =
             // Loop 3 times (for each axis), and inside loop twice (for opposing cube sides):
             for (let i = 0; i < 3; i++)
                 for (let j = 0; j < 2; j++) {
-                    if (i == 0 && j == 1){
+                    if ((i == 0 && j == 1) || (i == 2 && j == 0)){
                         //Skip Drawing that face
                     }
                     else {
