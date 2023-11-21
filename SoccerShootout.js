@@ -156,6 +156,7 @@ export class SoccerShootout extends Scene {
         };
 
         this.ball = new Ball(vec4(0, 30, 0, 1), 1);
+        this.power = 0;
 
 
         this.initial_camera_location = Mat4.look_at(vec3(0, 15, 40), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -183,7 +184,7 @@ export class SoccerShootout extends Scene {
         });
         this.key_triggered_button("Kick", ["m"], () => {
             if(!this.already_kicked){
-                let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(50);
+                let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(50*this.power);
                 this.ball.velocity[0] += dir_vec[0];
                 this.ball.velocity[1] += dir_vec[1];
                 this.ball.velocity[2] += dir_vec[2];
@@ -215,6 +216,7 @@ export class SoccerShootout extends Scene {
         const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         
         let r = Math.sin((Math.PI/2)*t) + 1;
+        this.power = r; 
 
         const light_position = vec4(0, 100, 0, 1);
         program_state.lights = [new Light(light_position, hex_color("#fdfbd3"), 10000)];
@@ -244,13 +246,18 @@ export class SoccerShootout extends Scene {
         // this.shapes.obstacle.draw(context, program_state, obstacle_transform2, this.materials.obstacle);
 
         let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
-        power_tr = Mat4.translation(15, 2, 0).times(power_tr);
+        power_tr = Mat4.translation(20, 10, -45).times(power_tr);
+        const r_n = r/2; 
+        const red = r_n;
+        const green = 1-r_n; 
+        const blue = 0;
+        let power_color = color(red, blue, green, 1);
 
         this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
 
         this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
-        this.shapes.power.draw(context, program_state, power_tr, this.materials.power_mat)
+        this.shapes.power.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
         
         // Transform Goal:
         const upright_tilt = Mat4.rotation(Math.PI / 2,1,0,0)
