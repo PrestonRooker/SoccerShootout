@@ -126,7 +126,7 @@ export class SoccerShootout extends Scene {
                 {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("#FF0000")}),
             net_texture: new Material(new defs.Textured_Phong(),
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
-                texture: new Texture("assets/soccer_net.jpg", "NEAREST")}),
+                texture: new Texture("assets/net.png", "NEAREST")}),
             post_color: new Material(new defs.Phong_Shader(),
             {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
             transparent: new Material(new defs.Phong_Shader(),
@@ -225,7 +225,7 @@ export class SoccerShootout extends Scene {
         const obstacle_transform2 = Mat4.translation(-2, 0, 0)
             .times(Mat4.rotation(Math.PI / 4, 0, 1, 0));
 
-        const { i, tr } = this.ball.update(dt, [obstacle_transform, obstacle_transform2]);
+        const { i, tr } = this.ball.update(dt, []);
         if (i != null) {
             this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
         }
@@ -237,8 +237,8 @@ export class SoccerShootout extends Scene {
         this.arrow_tr = arrow_tr
         // console.log(this.arrow_ang_x)
 
-        this.shapes.obstacle.draw(context, program_state, obstacle_transform, this.materials.obstacle);
-        this.shapes.obstacle.draw(context, program_state, obstacle_transform2, this.materials.obstacle);
+        // this.shapes.obstacle.draw(context, program_state, obstacle_transform, this.materials.obstacle);
+        // this.shapes.obstacle.draw(context, program_state, obstacle_transform2, this.materials.obstacle);
 
         let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
         power_tr = Mat4.translation(15, 2, 0).times(power_tr);
