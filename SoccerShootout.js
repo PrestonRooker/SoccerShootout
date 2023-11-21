@@ -193,9 +193,7 @@ export class SoccerShootout extends Scene {
         });
         this.new_line();
         this.key_triggered_button("Reset ball", ["r"], () => {
-            this.ball.position = vec4(0, 30, 0, 1)
-            this.ball.velocity = vec4(0, 0, 0, 0)
-            this.ball.goal = false
+            this.ball.reset(vec4(0, 30, 0, 1))
             this.already_kicked = false
         })
     }

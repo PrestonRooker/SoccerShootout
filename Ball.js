@@ -10,6 +10,30 @@ export default class Ball {
         this.velocity = vec4(0, 0, 0, 0);
         this.radius = 1;
         this.goal = false;
+        this.roll_tr = Mat4.identity()
+        this.roll_ang_x = 0
+        this.roll_ang_z = 0
+        this.roll_sp = 0
+    }
+
+    reset(initialPosition){
+        this.position = initialPosition;
+        this.velocity = vec4(0, 0, 0, 0);
+        this.radius = 1;
+        this.goal = false;
+        this.roll_tr = Mat4.identity()
+        this.roll_ang_x = 0
+        this.roll_ang_z = 0
+        this.roll_sp = 0
+    }
+
+    roll(dt){
+        this.roll_ang_x = this.velocity[0]
+        this.roll_ang_z = this.velocity[2]
+        this.roll_sp += Math.sqrt(this.roll_ang_x**2 + this.roll_ang_z**2) * dt * 0.5
+        if(this.roll_ang_x != 0 || this.roll_ang_z != 0){
+            this.roll_tr = Mat4.rotation(this.roll_sp,this.roll_ang_z,0,-this.roll_ang_x)
+        }
     }
 
     update(dt, obstacle_transforms) {
@@ -65,6 +89,8 @@ export default class Ball {
             const velocityProjected = collision.direction.times(collision.direction.dot(this.velocity) / collision.direction.dot(collision.direction));
             this.velocity = this.velocity.minus(velocityProjected.times(1.8));
         }
+
+        this.roll(dt)
 
         return {
             i: blah.i,
@@ -165,7 +191,7 @@ export default class Ball {
     }
 
     get transform() {
-        return Mat4.translation(...this.position);
+        return Mat4.translation(...this.position).times(this.roll_tr);
     }
 }
 
