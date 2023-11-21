@@ -245,13 +245,18 @@ export class SoccerShootout extends Scene {
         // this.shapes.obstacle.draw(context, program_state, obstacle_transform2, this.materials.obstacle);
 
         let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
-        power_tr = Mat4.translation(20, 2, -45).times(power_tr);
+        power_tr = Mat4.translation(20, 10, -45).times(power_tr);
+        const r_n = r/2; 
+        const red = r_n;
+        const green = 1-r_n; 
+        const blue = 0;
+        let power_color = color(red, blue, green, 1);
 
         this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
 
         this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
-        this.shapes.power.draw(context, program_state, power_tr, this.materials.power_mat)
+        this.shapes.power.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
         
         // Transform Goal:
         const upright_tilt = Mat4.rotation(Math.PI / 2,1,0,0)
