@@ -96,8 +96,8 @@ export class SoccerShootout extends Scene {
         this.arrow_ang_y = 0
         this.already_kicked = false
         // this.i = vec4(0,0,1,0)
-        this.x_range = [-20, 20]
-        this.y_range = [0, -38]
+        this.x_range = [-7, 7]
+        this.y_range = [-10, -38]
         this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1]), true, 0]
 
         // For collision debugging
