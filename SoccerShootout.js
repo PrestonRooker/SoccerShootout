@@ -5,6 +5,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
 
+const ball_initial_position = vec4(0,15,0,1)
 
 const SoccerGoal = defs.SoccerGoal =
     class SoccerGoal extends Shape {
@@ -106,7 +107,7 @@ export class SoccerShootout extends Scene {
             new Wireframe([1, 1, 1], [-1, 1, 1], [-1, 1, -1], [1, 1, -1]),
         ];
 
-        this.ball = new Ball(vec4(0, 30, 0, 1), 1);
+        this.ball = new Ball(ball_initial_position, 1);
 
         // *** Materials
         this.materials = {
@@ -155,7 +156,7 @@ export class SoccerShootout extends Scene {
             goalie: new defs.Goalie(),
         };
 
-        this.ball = new Ball(vec4(0, 30, 0, 1), 1);
+        this.ball = new Ball(ball_initial_position, 1);
         this.power = 0;
 
 
@@ -193,7 +194,7 @@ export class SoccerShootout extends Scene {
         });
         this.new_line();
         this.key_triggered_button("Reset ball", ["r"], () => {
-            this.ball.reset(vec4(0, 30, 0, 1))
+            this.ball.reset(ball_initial_position)
             this.already_kicked = false
         })
     }
