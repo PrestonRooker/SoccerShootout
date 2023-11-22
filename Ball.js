@@ -30,7 +30,7 @@ export default class Ball {
     roll(dt){
         this.roll_ang_x = this.velocity[0]
         this.roll_ang_z = this.velocity[2]
-        this.roll_sp += Math.sqrt(this.roll_ang_x**2 + this.roll_ang_z**2) * dt * 0.5
+        this.roll_sp += Math.sqrt(this.roll_ang_x**2 + this.roll_ang_z**2) * dt * 0.3
         if(this.roll_ang_x != 0 || this.roll_ang_z != 0){
             this.roll_tr = Mat4.rotation(this.roll_sp,this.roll_ang_z,0,-this.roll_ang_x)
         }
