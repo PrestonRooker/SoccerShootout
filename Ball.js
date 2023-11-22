@@ -48,24 +48,19 @@ export default class Ball {
 
         if (this.position[1] < 0)
         {
-
             // Friction
             // TODO: More realistic friction
-            if (this.velocity[0] > 0)
-                this.velocity[0] -= Math.min(2 * dt, this.velocity[0]);
-            if (this.velocity[0] < 0)
-                this.velocity[0] += Math.min(2 * dt, -this.velocity[0]);
-            if (this.velocity[2] > 0)
-                this.velocity[2] -= Math.min(2 * dt, this.velocity[2]);
-            if (this.velocity[2] < 0)
-                this.velocity[2] += Math.min(2 * dt, -this.velocity[2]);
+            let friction_coefficient = 0.975
+
+            this.velocity[0] *= friction_coefficient
+            this.velocity[2] *= friction_coefficient 
 
             // Bounce
             this.position[1] = 0;
             this.velocity[1] = this.velocity[1] * -0.5;
         }
 
-        if (this.position[0] > -8 && this.position[0] < 8 && this.position[2] < -40 && this.position[2] > -45){
+        if (this.position[0] > -8 && this.position[0] < 8 && this.position[2] < -40 && this.position[2] > -45 && this.position[1] < 10){
             this.goal = true
             this.velocity = vec4(0, 0, 0, 0);
             // this.position = vec4(this.position[0],this.position[1],this.position[2],this.position[3])
@@ -73,6 +68,7 @@ export default class Ball {
 
         if (this.goal) {
             console.log("GOOOOOAAAAALLLLL")
+            console.log(this.position)
         }
 
         let blah = {};
