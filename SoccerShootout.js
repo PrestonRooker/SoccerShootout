@@ -99,6 +99,7 @@ export class SoccerShootout extends Scene {
         this.x_range = [-7, 7]
         this.y_range = [-10, -38]
         this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1]), true, 0]
+        this.goalie_pos = [0, -3.5, -38]
 
         // For collision debugging
         this.wireframes = [
@@ -200,6 +201,7 @@ export class SoccerShootout extends Scene {
             this.ball.reset(ball_initial_position)
             this.already_kicked = false
             this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1]), true, 0]
+            this.goalie_pos = [0, -3.5, -38]
         })
     }
 
@@ -275,9 +277,10 @@ export class SoccerShootout extends Scene {
         this.shapes.goal.draw(context, program_state, goal_tr, this.materials.post_color)
         
         //Draw Goalie
-        let goalie_tr = Mat4.translation(0, -3.5, -38).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
+        let goalie_tr = Mat4.translation(this.goalie_pos[0], this.goalie_pos[1], this.goalie_pos[2]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
         this.goalie_tr = goalie_tr;
         this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
+        this.moveGoalie()
         
         let defender_tr = Mat4.translation(this.defender_pos[0], -3.5, this.defender_pos[1]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
         this.shapes.goalie.draw(context, program_state, defender_tr, this.materials.goalie_mat);
@@ -299,6 +302,22 @@ export class SoccerShootout extends Scene {
         if (i != null) {
             this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
         }
+    }
+
+    moveGoalie() {
+
+        console.log(this.ball.position, this.goalie_pos)
+        if (this.ball.position[0] < 8 && this.ball.position[0] > -8){
+            if (this.ball.position[0] > this.goalie_pos[0]){
+                this.goalie_pos[0] += 0.1
+            }
+            else {
+                this.goalie_pos[0] -= 0.1
+            }
+        }
+
+
+
     }
     
     moveDefender() {
