@@ -60,7 +60,7 @@ export default class Ball {
             this.velocity[1] = this.velocity[1] * -0.5;
         }
 
-        if (this.position[0] > -8 && this.position[0] < 8 && this.position[2] < -40 && this.position[2] > -45 && this.position[1] < 10){
+        if (this.position[0] > -8 && this.position[0] < 8 && this.position[2] < -40 && this.position[2] > -45 && this.position[1] < 6){
             this.goal = true
             this.velocity = vec4(0, 0, 0, 0);
             // this.position = vec4(this.position[0],this.position[1],this.position[2],this.position[3])
