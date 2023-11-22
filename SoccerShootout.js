@@ -97,7 +97,7 @@ export class SoccerShootout extends Scene {
         // this.i = vec4(0,0,1,0)
         this.x_range = [-20, 20]
         this.y_range = [0, -38]
-        this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1])]
+        this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1]), true, 0]
 
         // For collision debugging
         this.wireframes = [
@@ -200,7 +200,7 @@ export class SoccerShootout extends Scene {
             this.ball.velocity = vec4(0, 0, 0, 0)
             this.ball.goal = false
             this.already_kicked = false
-            this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1])]
+            this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1]), true, 0]
         })
     }
 
@@ -287,6 +287,11 @@ export class SoccerShootout extends Scene {
 
         let defender_tr = Mat4.translation(this.defender_pos[0], -3.5, this.defender_pos[1]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
         this.shapes.goalie.draw(context, program_state, defender_tr, this.materials.goalie_mat);
+        this.moveDefender()
+
+
+
+
         
         // let threshold_translation = Mat4.translation(0, 0, -40).times(panel_scale.times(Mat4.identity()))
         // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
@@ -294,6 +299,26 @@ export class SoccerShootout extends Scene {
         // Draw a blue dome around the field
         let bt = Mat4.scale(100,100,100).times(Mat4.identity())
         this.shapes.ball.draw(context,program_state,bt,this.materials.dome_mat)
+    }
+
+    moveDefender() {
+        if (this.defender_pos[2]){
+            this.defender_pos[3] += 0.025
+        }
+        else {
+            this.defender_pos[3] -= 0.025
+        }
+
+        if (this.defender_pos[3] > .25){
+            this.defender_pos[2] = false
+        }
+        if (this.defender_pos[3] < -.25){
+            this.defender_pos[2] = true
+        }
+
+        console.log(this.defender_pos[3])
+
+        this.defender_pos[0] += this.defender_pos[3]
     }
 
     getRandomInt(min, max) {
