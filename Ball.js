@@ -68,7 +68,7 @@ export default class Ball {
 
         if (this.goal) {
             console.log("GOOOOOAAAAALLLLL")
-            console.log(this.position)
+            // console.log(this.position)
         }
 
         let blah = {};
@@ -78,7 +78,7 @@ export default class Ball {
                 continue;
             blah = collision.face;
             
-            console.log(collision.direction, collision.distance, collision.face.i);
+            // console.log(collision.direction, collision.distance, collision.face.i);
             this.position = this.position.plus(collision.direction.times(collision.distance));
 
             // Reflect velocity across the vector (coeff of restitution = 0.8)

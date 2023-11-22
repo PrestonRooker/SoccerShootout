@@ -233,11 +233,6 @@ export class SoccerShootout extends Scene {
         const obstacle_transform2 = Mat4.translation(-2, 0, 0)
             .times(Mat4.rotation(Math.PI / 4, 0, 1, 0));
 
-        const { i, tr } = this.ball.update(dt, []);
-        if (i != null) {
-            this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
-        }
-
         let arrow_tr = Mat4.rotation(Math.PI,1,0,0).times(Mat4.identity())
         arrow_tr = Mat4.translation(0,0,-5).times(arrow_tr)
         arrow_tr = Mat4.rotation(this.arrow_ang_y,1,0,0).times(arrow_tr)
@@ -247,7 +242,7 @@ export class SoccerShootout extends Scene {
 
         // this.shapes.obstacle.draw(context, program_state, obstacle_transform, this.materials.obstacle);
         // this.shapes.obstacle.draw(context, program_state, obstacle_transform2, this.materials.obstacle);
-
+        
         let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
         power_tr = Mat4.translation(20, 10, -45).times(power_tr);
         const r_n = r/2; 
@@ -255,9 +250,9 @@ export class SoccerShootout extends Scene {
         const green = 1-r_n; 
         const blue = 0;
         let power_color = color(red, blue, green, 1);
-
+        
         this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
-
+        
         this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
         this.shapes.power.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
@@ -269,37 +264,43 @@ export class SoccerShootout extends Scene {
         
         const panel_width = 80 / 5; // Same as the crossbar length
         const panel_height = 6; // Same as the post height
-
+        
         // Create and position the back panel
         const panel_scale = Mat4.scale(panel_width / 2, 5, panel_height / 2);
         const panel_translation = Mat4.translation(0, 0, -14.3).times(upright_tilt); // Slightly behind the goal
         let net_tr = panel_scale.times(panel_translation).times(Mat4.identity())
-
+        
         // Use a Square or Rectangle shape for the panel
         this.shapes.net.draw(context, program_state, net_tr, this.materials.net_texture)
         this.shapes.goal.draw(context, program_state, goal_tr, this.materials.post_color)
-
+        
         //Draw Goalie
         let goalie_tr = Mat4.translation(0, -3.5, -38).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
         this.goalie_tr = goalie_tr;
         this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
-
+        
         let defender_tr = Mat4.translation(this.defender_pos[0], -3.5, this.defender_pos[1]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
         this.shapes.goalie.draw(context, program_state, defender_tr, this.materials.goalie_mat);
         this.moveDefender()
-
-
-
-
         
         // let threshold_translation = Mat4.translation(0, 0, -40).times(panel_scale.times(Mat4.identity()))
         // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
-
+        
         // Draw a blue dome around the field
         let bt = Mat4.scale(100,100,100).times(Mat4.identity())
         this.shapes.ball.draw(context,program_state,bt,this.materials.dome_mat)
+        
+        
+        goalie_tr = Mat4.translation(0,3.5,0).times(goalie_tr).times(Mat4.scale(1,1,4))
+        defender_tr = Mat4.translation(0,3.5,0).times(defender_tr).times(Mat4.scale(1,1,4))
+        // this.shapes.obstacle.draw(context, program_state, goalie_tr, this.materials.obstacle);
+        // this.shapes.obstacle.draw(context, program_state, defender_tr, this.materials.obstacle);
+        const { i, tr } = this.ball.update(dt, [goalie_tr, defender_tr]);
+        if (i != null) {
+            this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
+        }
     }
-
+    
     moveDefender() {
         if (this.defender_pos[2]){
             this.defender_pos[3] += 0.025
@@ -315,7 +316,7 @@ export class SoccerShootout extends Scene {
             this.defender_pos[2] = true
         }
 
-        console.log(this.defender_pos[3])
+        // console.log(this.defender_pos[3])
 
         this.defender_pos[0] += this.defender_pos[3]
     }
