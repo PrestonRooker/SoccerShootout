@@ -296,9 +296,15 @@ export class SoccerShootout extends Scene {
         
         goalie_tr = Mat4.translation(0,3.5,0).times(goalie_tr).times(Mat4.scale(1,1,4))
         defender_tr = Mat4.translation(0,3.5,0).times(defender_tr).times(Mat4.scale(1,1,4))
-        // this.shapes.obstacle.draw(context, program_state, goalie_tr, this.materials.obstacle);
+
+        let crossbar_tr = goal_tr.times(Mat4.translation(0, 0, 15)).times(Mat4.scale(8,0.5,0.5))
+        let left_post_tr = goal_tr.times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(4,0.5,0.5)).times(Mat4.translation(-4.6,0,-16))
+        let right_post_tr = left_post_tr.times(Mat4.translation(0,0,32))
+        // this.shapes.obstacle.draw(context, program_state, crossbar_tr, this.materials.obstacle);
+        // this.shapes.obstacle.draw(context, program_state, left_post_tr, this.materials.obstacle);
+        // this.shapes.obstacle.draw(context, program_state, right_post_tr, this.materials.obstacle);
         // this.shapes.obstacle.draw(context, program_state, defender_tr, this.materials.obstacle);
-        const { i, tr } = this.ball.update(dt, [goalie_tr, defender_tr]);
+        const { i, tr } = this.ball.update(dt, [goalie_tr, defender_tr, crossbar_tr, left_post_tr, right_post_tr]);
         if (i != null) {
             this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
         }
