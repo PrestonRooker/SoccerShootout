@@ -280,11 +280,11 @@ export class SoccerShootout extends Scene {
         let goalie_tr = Mat4.translation(this.goalie_pos[0], this.goalie_pos[1], this.goalie_pos[2]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
         this.goalie_tr = goalie_tr;
         this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
-        this.moveGoalie()
+        this.moveGoalie(dt)
         
         let defender_tr = Mat4.translation(this.defender_pos[0], -3.5, this.defender_pos[1]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
         this.shapes.goalie.draw(context, program_state, defender_tr, this.materials.goalie_mat);
-        this.moveDefender()
+        this.moveDefender(dt)
         
         // let threshold_translation = Mat4.translation(0, 0, -40).times(panel_scale.times(Mat4.identity()))
         // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
@@ -310,15 +310,15 @@ export class SoccerShootout extends Scene {
         }
     }
 
-    moveGoalie() {
+    moveGoalie(dt) {
 
         console.log(this.ball.position, this.goalie_pos)
         if (this.ball.position[0] < 8 && this.ball.position[0] > -8){
             if (this.ball.position[0] > this.goalie_pos[0]){
-                this.goalie_pos[0] += 0.1
+                this.goalie_pos[0] += dt * 5
             }
             else {
-                this.goalie_pos[0] -= 0.1
+                this.goalie_pos[0] -= dt * 5
             }
         }
 
@@ -326,12 +326,12 @@ export class SoccerShootout extends Scene {
 
     }
     
-    moveDefender() {
+    moveDefender(dt) {
         if (this.defender_pos[2]){
-            this.defender_pos[3] += 0.025
+            this.defender_pos[3] += dt 
         }
         else {
-            this.defender_pos[3] -= 0.025
+            this.defender_pos[3] -= dt
         }
 
         if (this.defender_pos[3] > .25){
