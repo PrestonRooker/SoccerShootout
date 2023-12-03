@@ -94,17 +94,11 @@ export class SoccerShootout extends Scene {
 
         this.arrow_ang_x = 0
         this.arrow_ang_y = 0
-        this.already_kicked = false
         // this.i = vec4(0,0,1,0)
         this.x_range = [-7, 7]
         this.y_range = [-10, -38]
-        this.defender = {
-            x_pos: this.getRandomInt(this.x_range[0], this.x_range[1]),
-            z_pos: this.getRandomInt(this.y_range[0], this.y_range[1]),
-            accel_in_positive_x: true,
-            x_vel: 0,
-        };
-        this.goalie_pos = [0, -3.5, -38]
+        this.ball = new Ball(ball_initial_position, 1);
+        this.reset();
 
         // For collision debugging
         this.wireframes = [
@@ -115,8 +109,6 @@ export class SoccerShootout extends Scene {
             new Wireframe([1, 1, 1], [1, -1, 1], [-1, -1, 1], [-1, 1, 1]),
             new Wireframe([1, 1, 1], [-1, 1, 1], [-1, 1, -1], [1, 1, -1]),
         ];
-
-        this.ball = new Ball(ball_initial_position, 1);
 
         // *** Materials
         this.materials = {
@@ -165,7 +157,6 @@ export class SoccerShootout extends Scene {
             goalie: new defs.Goalie(),
         };
 
-        this.ball = new Ball(ball_initial_position, 1);
         this.power = 0;
 
 
@@ -202,17 +193,19 @@ export class SoccerShootout extends Scene {
             }
         });
         this.new_line();
-        this.key_triggered_button("Reset ball", ["r"], () => {
-            this.ball.reset(ball_initial_position)
-            this.already_kicked = false
-            this.defender = {
-                x_pos: this.getRandomInt(this.x_range[0], this.x_range[1]),
-                z_pos: this.getRandomInt(this.y_range[0], this.y_range[1]),
-                accel_in_positive_x: true,
-                x_vel: 0,
-            };
-            this.goalie_pos = [0, -3.5, -38]
-        })
+        this.key_triggered_button("Reset ball", ["r"], this.reset);
+    }
+
+    reset() {
+        this.ball.reset(ball_initial_position)
+        this.already_kicked = false
+        this.defender = {
+            x_pos: this.getRandomInt(this.x_range[0], this.x_range[1]),
+            z_pos: this.getRandomInt(this.y_range[0], this.y_range[1]),
+            accel_in_positive_x: true,
+            x_vel: 0,
+        };
+        this.goalie_pos = [0, -3.5, -38]
     }
 
     display(context, program_state) {
@@ -321,8 +314,6 @@ export class SoccerShootout extends Scene {
     }
 
     moveGoalie(dt) {
-
-        console.log(this.ball.position, this.goalie_pos)
         if (this.ball.position[0] < 8 && this.ball.position[0] > -8){
             if (this.ball.position[0] > this.goalie_pos[0]){
                 this.goalie_pos[0] += dt * 5
