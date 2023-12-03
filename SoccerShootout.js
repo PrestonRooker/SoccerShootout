@@ -98,7 +98,12 @@ export class SoccerShootout extends Scene {
         // this.i = vec4(0,0,1,0)
         this.x_range = [-7, 7]
         this.y_range = [-10, -38]
-        this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1]), true, 0]
+        this.defender = {
+            x_pos: this.getRandomInt(this.x_range[0], this.x_range[1]),
+            z_pos: this.getRandomInt(this.y_range[0], this.y_range[1]),
+            accel_in_positive_x: true,
+            x_vel: 0,
+        };
         this.goalie_pos = [0, -3.5, -38]
 
         // For collision debugging
@@ -200,7 +205,12 @@ export class SoccerShootout extends Scene {
         this.key_triggered_button("Reset ball", ["r"], () => {
             this.ball.reset(ball_initial_position)
             this.already_kicked = false
-            this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1]), true, 0]
+            this.defender = {
+                x_pos: this.getRandomInt(this.x_range[0], this.x_range[1]),
+                z_pos: this.getRandomInt(this.y_range[0], this.y_range[1]),
+                accel_in_positive_x: true,
+                x_vel: 0,
+            };
             this.goalie_pos = [0, -3.5, -38]
         })
     }
@@ -282,7 +292,7 @@ export class SoccerShootout extends Scene {
         this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
         this.moveGoalie()
         
-        let defender_tr = Mat4.translation(this.defender_pos[0], -3.5, this.defender_pos[1]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
+        let defender_tr = Mat4.translation(this.defender.x_pos, -3.5, this.defender.z_pos).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
         this.shapes.goalie.draw(context, program_state, defender_tr, this.materials.goalie_mat);
         this.moveDefender()
         
@@ -327,23 +337,23 @@ export class SoccerShootout extends Scene {
     }
     
     moveDefender() {
-        if (this.defender_pos[2]){
-            this.defender_pos[3] += 0.025
+        if (this.defender.accel_in_positive_x){
+            this.defender.x_vel += 0.025
         }
         else {
-            this.defender_pos[3] -= 0.025
+            this.defender.x_vel -= 0.025
         }
 
-        if (this.defender_pos[3] > .25){
-            this.defender_pos[2] = false
+        if (this.defender.x_vel > .25){
+            this.defender.accel_in_positive_x = false
         }
-        if (this.defender_pos[3] < -.25){
-            this.defender_pos[2] = true
+        if (this.defender.x_vel < -.25){
+            this.defender.accel_in_positive_x = true
         }
 
-        // console.log(this.defender_pos[3])
+        // console.log(this.defender[3])
 
-        this.defender_pos[0] += this.defender_pos[3]
+        this.defender.x_pos += this.defender.x_vel
     }
 
     getRandomInt(min, max) {
