@@ -314,7 +314,7 @@ export class SoccerShootout extends Scene {
     }
 
     moveGoalie(dt) {
-        if (this.ball.position[0] < 8 && this.ball.position[0] > -8){
+        if (this.already_kicked && this.ball.position[0] < 8 && this.ball.position[0] > -8){
             if (this.ball.position[0] > this.goalie_pos[0]){
                 this.goalie_pos[0] += dt * 5
             }
@@ -322,9 +322,6 @@ export class SoccerShootout extends Scene {
                 this.goalie_pos[0] -= dt * 5
             }
         }
-
-
-
     }
     
     moveDefender(dt) {
