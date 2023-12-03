@@ -1,5 +1,6 @@
 import {defs, tiny} from './examples/common.js';
 import Ball from './Ball.js';
+import { updateScore } from './text-manager.js';
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
@@ -99,6 +100,7 @@ export class SoccerShootout extends Scene {
         this.x_range = [-7, 7]
         this.y_range = [-10, -38]
         this.ball = new Ball(ball_initial_position, 1);
+        this.goals = 0;
         this.reset();
 
         // For collision debugging
@@ -207,6 +209,7 @@ export class SoccerShootout extends Scene {
             x_vel: 0,
         };
         this.goalie_pos = [0, -3.5, -38]
+        this.scored_this_possession = false;
     }
 
     display(context, program_state) {
@@ -308,9 +311,13 @@ export class SoccerShootout extends Scene {
         // this.shapes.obstacle.draw(context, program_state, left_post_tr, this.materials.obstacle);
         // this.shapes.obstacle.draw(context, program_state, right_post_tr, this.materials.obstacle);
         // this.shapes.obstacle.draw(context, program_state, defender_tr, this.materials.obstacle);
-        const { i, tr } = this.ball.update(dt, [goalie_tr, defender_tr, crossbar_tr, left_post_tr, right_post_tr]);
-        if (i != null) {
-            this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
+        const { debug: { wireframe_index, transform: wireframe_transform } } = this.ball.update(dt, [goalie_tr, defender_tr, crossbar_tr, left_post_tr, right_post_tr]);
+        if (wireframe_index != null) {
+            this.wireframes[wireframe_index].draw(context, program_state, wireframe_transform, this.materials.wireframe, "LINES");
+        }
+        if (this.ball.goal && !this.scored_this_possession) {
+            this.goals++;
+            this.scored_this_possession = true;
         }
 
         // Do not follow the ball with the camera if it goes out of bounds
@@ -323,6 +330,8 @@ export class SoccerShootout extends Scene {
                 );
             program_state.set_camera(targetCamera.map((x, i) => Vector.from(program_state.camera_inverse[i]).mix(x, 0.05)));
         }
+
+        updateScore(this.goals);
     }
 
     moveGoalie(dt) {

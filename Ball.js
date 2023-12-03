@@ -73,12 +73,12 @@ export default class Ball {
             // console.log(this.position)
         }
 
-        let blah = {};
+        let collided_face = {};
         for (const obs of obstacle_transforms) {
             const collision = this.getCollision(obs);
             if (collision == null)
                 continue;
-            blah = collision.face;
+            collided_face = collision.face;
             
             // console.log(collision.direction, collision.distance, collision.face.i);
             this.position = this.position.plus(collision.direction.times(collision.distance));
@@ -91,8 +91,10 @@ export default class Ball {
         this.roll(dt)
 
         return {
-            i: blah.i,
-            tr: blah.tr
+            debug: {
+                wireframe_index: collided_face.i,
+                transform: collided_face.tr
+            }
         };
     }
 

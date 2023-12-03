@@ -1,0 +1,27 @@
+#main-canvas {
+    position: relative;
+}
+
+#score-container {
+    background-color: black;
+    z-index: 1;
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    border-radius: 1rem;
+
+}
+
+#score-text {
+    color: white;
+    margin: 0.4rem 0.8rem;
+    font-size: 1.4rem;
+    font-family: Poppins;
+    text-align: center;
+}
+
+@font-face {
+    font-family: Poppins;
+    font-weight: bold;
+    src: url('assets/Poppins-Bold.ttf');
+}
