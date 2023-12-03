@@ -37,9 +37,6 @@ export default class Ball {
     }
 
     update(dt, obstacle_transforms) {
-        // Cap dt to prevent explosions
-        if (dt > 0.05)
-            dt = 0.05;
 
         if(this.goal==false){
             this.velocity = this.velocity.plus(vec4(0, -gravity, 0, 0).times(dt));

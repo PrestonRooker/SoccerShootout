@@ -225,8 +225,13 @@ export class SoccerShootout extends Scene {
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, .1, 1000);
         
-        const t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
+        const t = program_state.animation_time / 1000;
+        let dt = program_state.animation_delta_time / 1000;
         
+        // Cap dt to prevent explosions
+        if (dt > 0.05)
+            dt = 0.05;
+
         let r = Math.sin((Math.PI/2)*t) + 1;
         this.power = r; 
 
