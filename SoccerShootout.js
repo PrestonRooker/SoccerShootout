@@ -290,11 +290,11 @@ export class SoccerShootout extends Scene {
         let goalie_tr = Mat4.translation(this.goalie_pos[0], this.goalie_pos[1], this.goalie_pos[2]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
         this.goalie_tr = goalie_tr;
         this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
-        this.moveGoalie()
+        this.moveGoalie(dt)
         
         let defender_tr = Mat4.translation(this.defender.x_pos, -3.5, this.defender.z_pos).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
         this.shapes.goalie.draw(context, program_state, defender_tr, this.materials.goalie_mat);
-        this.moveDefender()
+        this.moveDefender(dt)
         
         // let threshold_translation = Mat4.translation(0, 0, -40).times(panel_scale.times(Mat4.identity()))
         // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
@@ -320,15 +320,15 @@ export class SoccerShootout extends Scene {
         }
     }
 
-    moveGoalie() {
+    moveGoalie(dt) {
 
         console.log(this.ball.position, this.goalie_pos)
         if (this.ball.position[0] < 8 && this.ball.position[0] > -8){
             if (this.ball.position[0] > this.goalie_pos[0]){
-                this.goalie_pos[0] += 0.1
+                this.goalie_pos[0] += dt * 5
             }
             else {
-                this.goalie_pos[0] -= 0.1
+                this.goalie_pos[0] -= dt * 5
             }
         }
 
@@ -336,12 +336,12 @@ export class SoccerShootout extends Scene {
 
     }
     
-    moveDefender() {
+    moveDefender(dt) {
         if (this.defender.accel_in_positive_x){
-            this.defender.x_vel += 0.025
+            this.defender.x_vel += dt
         }
         else {
-            this.defender.x_vel -= 0.025
+            this.defender.x_vel -= dt
         }
 
         if (this.defender.x_vel > .25){
@@ -351,7 +351,7 @@ export class SoccerShootout extends Scene {
             this.defender.accel_in_positive_x = true
         }
 
-        // console.log(this.defender[3])
+        // console.log(this.defender.x_vel)
 
         this.defender.x_pos += this.defender.x_vel
     }
