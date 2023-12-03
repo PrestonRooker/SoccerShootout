@@ -6,6 +6,7 @@ const {
 } = tiny;
 
 const ball_initial_position = vec4(0,15,0,1)
+const domeRadius = 100;
 
 const SoccerGoal = defs.SoccerGoal =
     class SoccerGoal extends Shape {
@@ -293,7 +294,7 @@ export class SoccerShootout extends Scene {
         // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
         
         // Draw a blue dome around the field
-        let bt = Mat4.scale(100,100,100).times(Mat4.identity())
+        let bt = Mat4.scale(domeRadius,domeRadius,domeRadius).times(Mat4.identity())
         this.shapes.ball.draw(context,program_state,bt,this.materials.dome_mat)
         
         
@@ -310,6 +311,17 @@ export class SoccerShootout extends Scene {
         const { i, tr } = this.ball.update(dt, [goalie_tr, defender_tr, crossbar_tr, left_post_tr, right_post_tr]);
         if (i != null) {
             this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
+        }
+
+        // Do not follow the ball with the camera if it goes out of bounds
+        if (this.ball.position.dot(this.ball.position) < domeRadius ** 2)
+        {
+            const targetCamera = Mat4.inverse(
+                Mat4.translation(...this.ball.position)
+                    .times(Mat4.rotation(-Math.PI / 12, 1, 0, 0))
+                    .times(Mat4.translation(0, 0, 25))
+                );
+            program_state.set_camera(targetCamera.map((x, i) => Vector.from(program_state.camera_inverse[i]).mix(x, 0.05)));
         }
     }
 
