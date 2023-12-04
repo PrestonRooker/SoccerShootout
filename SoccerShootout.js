@@ -62,7 +62,7 @@ const Goalie = defs.Goalie =
             // defs.Closed_Cone.insert_transformed_copy_into(this,[10,30],
             //     Mat4.translation(0,0,7).times(Mat4.scale(0.8,0.8,0.8)))
             defs.Capped_Cylinder.insert_transformed_copy_into(this,[30,30],
-                Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)))
+                Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)));
             // Sphere on top of the Cylinder
             const sphere_scale = Mat4.scale(1, 1, 1); // Adjust the scale as needed
             const sphere_translation = Mat4.translation(0, 0, 6.6); // Adjust the position above the cylinder
@@ -261,7 +261,7 @@ export class SoccerShootout extends Scene {
         power_tr = Mat4.translation(20, 10, -45).times(power_tr);
         const r_n = r/2; 
         const red = r_n;
-        const green = 1-r_n; 
+        const green = 1-r_n;
         const blue = 0;
         let power_color = color(red, blue, green, 1);
         
