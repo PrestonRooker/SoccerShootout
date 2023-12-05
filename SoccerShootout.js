@@ -1,6 +1,6 @@
 import {defs, tiny} from './examples/common.js';
 import Ball from './Ball.js';
-import { updateScore } from './text-manager.js';
+import { updateScore, updateGoalText } from './text-manager.js';
 import Defender from './Defender.js'
 
 const {
@@ -179,6 +179,7 @@ export class SoccerShootout extends Scene {
             let defender = new Defender(this.x_range, this.y_range)
             this.defenders.push(defender)
         }
+        this.scored_this_possession = null;
     }
 
     display(context, program_state) {
@@ -254,7 +255,11 @@ export class SoccerShootout extends Scene {
         // Use a Square or Rectangle shape for the panel
         this.shapes.net.draw(context, program_state, net_tr, this.materials.net_texture)
         this.shapes.goal.draw(context, program_state, goal_tr, this.materials.post_color)
-        
+
+        const backnet_transform = net_tr.times(Mat4.translation(0, -1, 0)).times(Mat4.scale(1, 0.01, 1));
+        const leftnet_transform = net_tr.times(Mat4.translation(-1, 0, 0)).times(Mat4.scale(0.01, 1, 1));
+        const rightnet_transform = net_tr.times(Mat4.translation(1, 0, 0)).times(Mat4.scale(0.01, 1, 1));
+        const topnet_transform = net_tr.times(Mat4.translation(0, 0, -1)).times(Mat4.scale(1, 1, 0.01));
 
         let goalie_tr = Mat4.identity()
 
@@ -295,31 +300,39 @@ export class SoccerShootout extends Scene {
         let left_post_tr = goal_tr.times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(4,0.5,0.5)).times(Mat4.translation(-4.6,0,-16))
         let right_post_tr = left_post_tr.times(Mat4.translation(0,0,32))
 
-        let collidable_obstacles = [crossbar_tr, left_post_tr, right_post_tr]
+        let collidable_obstacles = [
+            crossbar_tr, left_post_tr, right_post_tr,
+            backnet_transform, leftnet_transform, rightnet_transform, topnet_transform
+        ]
+        let restitution_coefs = [
+            0.8, 0.8, 0.8,
+            0.3, 0.3, 0.3, 0.3,
+        ];
         // console.log(this.level, this.level_obstaces[this.level], this.defenders)
         if (this.level_obstaces[this.level]["goalies"] == 1){
             goalie_tr = Mat4.translation(0,3.5,0).times(goalie_tr).times(Mat4.scale(1,1,4))
             collidable_obstacles.push(goalie_tr)
+            restitution_coefs.push(0.8)
         }
         for (let index = 0; index < this.defenders.length; index++){
             collidable_obstacles.push(this.defenders[index].get_tr())
+            restitution_coefs.push(0.8)
         }
 
-        const { i, tr } = this.ball.update(dt, collidable_obstacles);
+        const { i, tr } = this.ball.update(dt, collidable_obstacles, restitution_coefs);
         if (i != null) {
             this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
         }
 
-        if (this.ball.goal){
+        if (this.ball.goal && this.scored_this_possession == null) {
+            this.goals++;
+            this.scored_this_possession = t;
+        }
+        if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
             this.level += 1
             this.level = this.level % 5
             this.reset();
         }
-        if (this.ball.goal && !this.scored_this_possession) {
-            this.goals++;
-            this.scored_this_possession = true;
-        }
-        
         // Do not follow the ball with the camera if it goes out of bounds
         if (this.ball.position.dot(this.ball.position) < domeRadius ** 2)
         {
@@ -337,6 +350,7 @@ export class SoccerShootout extends Scene {
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
         this.shapes.ball.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
 
+        updateGoalText(this.ball.goal);
         updateScore(this.level);
     }
 

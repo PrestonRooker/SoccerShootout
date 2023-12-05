@@ -63,8 +63,8 @@ export default class Defender {
             this.move_right = true
         }
 
-        console.log(this.movement_change)
-        console.log(this.move_right)
+        // console.log(this.movement_change)
+        // console.log(this.move_right)
 
         // console.log(this.defender_pos[3])
 
