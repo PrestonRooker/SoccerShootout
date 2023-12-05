@@ -55,28 +55,6 @@ const Arrow = defs.Arrow =
         }
     }
 
-const Goalie = defs.Goalie = 
-    class Goalie extends Shape{
-        constructor(){
-            super("position","normal","texture_coord");
-            // defs.Closed_Cone.insert_transformed_copy_into(this,[10,30],
-            //     Mat4.translation(0,0,7).times(Mat4.scale(0.8,0.8,0.8)))
-            defs.Capped_Cylinder.insert_transformed_copy_into(this,[30,30],
-                Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)));
-            // Sphere on top of the Cylinder
-            const sphere_scale = Mat4.scale(1, 1, 1); // Adjust the scale as needed
-            const sphere_translation = Mat4.translation(0, 0, 6.6); // Adjust the position above the cylinder
-            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], sphere_translation.times(sphere_scale));
-            // Sphere on the left side of the Cylinder
-            const left_sphere_scale = Mat4.scale(0.5, 0.5, 0.5); // Adjust the scale as needed
-            const left_sphere_translation = Mat4.translation(-1.5, 0, 4); // Adjust the position
-            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], left_sphere_translation.times(left_sphere_scale));
-            // Sphere on the right side of the Cylinder
-            const right_sphere_scale = Mat4.scale(0.5, 0.5, 0.5); // Adjust the scale as needed
-            const right_sphere_translation = Mat4.translation(1.5, 0, 4); // Adjust the position
-            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], right_sphere_translation.times(right_sphere_scale));
-        }
-    }
 
 class Wireframe extends Shape {
     constructor(...args) {
@@ -160,7 +138,6 @@ export class SoccerShootout extends Scene {
             net: new defs.OpenCube(),
             rectangle: new defs.Square(),
             obstacle: new defs.Cube(),
-            goalie: new defs.Goalie(),
         };
 
         this.power = 0;
@@ -177,18 +154,6 @@ export class SoccerShootout extends Scene {
         this.key_triggered_button("Aim Up", ["ArrowUp"], () => this.arrow_ang_y = Math.min(this.arrow_ang_y + Math.PI/48,Math.PI/2));
         this.key_triggered_button("Aim Down", ["ArrowDown"], () => this.arrow_ang_y = Math.max(this.arrow_ang_y - Math.PI/48,0));
         this.new_line();
-        // this.key_triggered_button("Kick left", ["j"], () => {
-        //     this.ball.velocity[0] -= 50*this.power;
-        // });
-        // this.key_triggered_button("Kick right", ["l"], () => {
-        //     this.ball.velocity[0] += 50*this.power;
-        // });
-        // this.key_triggered_button("Kick forward", ["i"], () => {
-        //     this.ball.velocity[2] -= 50*this.power;
-        // });
-        // this.key_triggered_button("Kick back", ["k"], () => {
-        //     this.ball.velocity[2] += 50*this.power;
-        // });
         this.key_triggered_button("Kick", ["m"], () => {
             if(!this.already_kicked){
                 let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(50*this.power);
@@ -348,7 +313,7 @@ export class SoccerShootout extends Scene {
         if (this.ball.goal){
             this.level += 1
             this.level = this.level % 5
-            this.reset()
+            this.reset();
         }
         if (this.ball.goal && !this.scored_this_possession) {
             this.goals++;

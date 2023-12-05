@@ -4,29 +4,6 @@ const { Vector3, vec3, Vector4, vec4, Mat4, Shape, Material, hex_color, Texture 
 
 const gravity = 20;
 
-const Goalie = defs.Goalie =
-    class Goalie extends Shape{
-        constructor(){
-            super("position","normal","texture_coord");
-            // defs.Closed_Cone.insert_transformed_copy_into(this,[10,30],
-            //     Mat4.translation(0,0,7).times(Mat4.scale(0.8,0.8,0.8)))
-            defs.Capped_Cylinder.insert_transformed_copy_into(this,[30,30],
-                Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)))
-            // Sphere on top of the Cylinder
-            const sphere_scale = Mat4.scale(1, 1, 1); // Adjust the scale as needed
-            const sphere_translation = Mat4.translation(0, 0, 6.6); // Adjust the position above the cylinder
-            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], sphere_translation.times(sphere_scale));
-            // Sphere on the left side of the Cylinder
-            const left_sphere_scale = Mat4.scale(0.5, 0.5, 0.5); // Adjust the scale as needed
-            const left_sphere_translation = Mat4.translation(-1.5, 0, 4); // Adjust the position
-            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], left_sphere_translation.times(left_sphere_scale));
-            // Sphere on the right side of the Cylinder
-            const right_sphere_scale = Mat4.scale(0.5, 0.5, 0.5); // Adjust the scale as needed
-            const right_sphere_translation = Mat4.translation(1.5, 0, 4); // Adjust the position
-            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], right_sphere_translation.times(right_sphere_scale));
-        }
-    }
-
 export default class Defender {
 
     constructor(x_range, y_range, speed = 1.0, range = 0.25){
@@ -50,7 +27,6 @@ export default class Defender {
         }
 
         this.shapes = {
-            goalie: new defs.Goalie(),
             ball: new defs.Subdivision_Sphere(4),
             cylinder: new defs.Capped_Cylinder(30, 30),
         }
@@ -68,7 +44,6 @@ export default class Defender {
         this.shapes.ball.draw(context, program_state, d_left_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
         this.shapes.ball.draw(context, program_state, d_right_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
         this.shapes.cylinder.draw(context, program_state, d_body, this.materials.ball_mat.override(hex_color("#00ffff")));
-        //this.shapes.goalie.draw(context, program_state, this.defender_tr, this.materials.goalie_mat);
         this.defender_tr = Mat4.translation(0,3.5,0).times(this.defender_tr).times(Mat4.scale(1,1,4))
     }
 

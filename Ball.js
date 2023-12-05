@@ -6,14 +6,7 @@ const gravity = 20;
 
 export default class Ball {
     constructor(initialPosition) {
-        this.position = initialPosition;
-        this.velocity = vec4(0, 0, 0, 0);
-        this.radius = 1;
-        this.goal = false;
-        this.roll_tr = Mat4.identity()
-        this.roll_ang_x = 0
-        this.roll_ang_z = 0
-        this.roll_sp = 0
+        this.reset(initialPosition);
     }
 
     reset(initialPosition){
