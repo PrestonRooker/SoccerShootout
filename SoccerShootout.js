@@ -1,5 +1,6 @@
 import {defs, tiny} from './examples/common.js';
 import Ball from './Ball.js';
+import Defender from './Defender.js'
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
@@ -12,7 +13,6 @@ const SoccerGoal = defs.SoccerGoal =
         constructor(net_material, post_material) {
             super("position", "normal", "texture_coord");
 
- 
             // Dimensions for the soccer goal
             const post_height = 6; // Adjust as needed
             const post_radius = 0.2; // Adjust as needed
@@ -95,12 +95,12 @@ export class SoccerShootout extends Scene {
         this.arrow_ang_x = 0
         this.arrow_ang_y = 0
         this.already_kicked = false
-        // this.i = vec4(0,0,1,0)
         this.x_range = [-7, 7]
         this.y_range = [-10, -38]
-        this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1]), true, 0]
         this.goalie_pos = [0, -3.5, -38]
-
+        this.level = 0
+        this.level_obstaces = [{"goalies": 0, "defenders": 0}, {"goalies": 1, "defenders": 0}, {"goalies": 1, "defenders": 1}, {"goalies": 1, "defenders": 2}, {"goalies": 1, "defenders": 3}]
+        this.defenders = []
         // For collision debugging
         this.wireframes = [
             new Wireframe([-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [-1, -1, 1]),
@@ -163,7 +163,6 @@ export class SoccerShootout extends Scene {
         this.ball = new Ball(ball_initial_position, 1);
         this.power = 0;
 
-
         this.initial_camera_location = Mat4.look_at(vec3(0, 15, 40), vec3(0, 0, 0), vec3(0, 1, 0));
     }
 
@@ -198,11 +197,20 @@ export class SoccerShootout extends Scene {
         });
         this.new_line();
         this.key_triggered_button("Reset ball", ["r"], () => {
-            this.ball.reset(ball_initial_position)
-            this.already_kicked = false
-            this.defender_pos = [this.getRandomInt(this.x_range[0], this.x_range[1]), this.getRandomInt(this.y_range[0], this.y_range[1]), true, 0]
-            this.goalie_pos = [0, -3.5, -38]
+            this.level = 0
+            this.reset()
         })
+    }
+
+    reset() {
+        this.ball.reset(ball_initial_position)
+        this.already_kicked = false
+        this.goalie_pos = [0, -3.5, -38]
+        this.defenders = []
+        for (let index = 0; index < this.level_obstaces[this.level]["defenders"]; index++){
+            let defender = new Defender(this.x_range, this.y_range)
+            this.defenders.push(defender)
+        }
     }
 
     display(context, program_state) {
@@ -276,15 +284,20 @@ export class SoccerShootout extends Scene {
         this.shapes.net.draw(context, program_state, net_tr, this.materials.net_texture)
         this.shapes.goal.draw(context, program_state, goal_tr, this.materials.post_color)
         
+        let goalie_tr = Mat4.identity()
+
         //Draw Goalie
-        let goalie_tr = Mat4.translation(this.goalie_pos[0], this.goalie_pos[1], this.goalie_pos[2]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
-        this.goalie_tr = goalie_tr;
-        this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
-        this.moveGoalie(dt)
+        if (this.level_obstaces[this.level]["goalies"] == 1){
+            goalie_tr = Mat4.translation(this.goalie_pos[0], this.goalie_pos[1], this.goalie_pos[2]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
+            this.goalie_tr = goalie_tr;
+            this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
+            this.moveGoalie(dt)
+        }
         
-        let defender_tr = Mat4.translation(this.defender_pos[0], -3.5, this.defender_pos[1]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
-        this.shapes.goalie.draw(context, program_state, defender_tr, this.materials.goalie_mat);
-        this.moveDefender(dt)
+        for (let index = 0; index < this.defenders.length; index++){
+            this.defenders[index].move(dt)
+            this.defenders[index].draw(context, program_state)
+        }
         
         // let threshold_translation = Mat4.translation(0, 0, -40).times(panel_scale.times(Mat4.identity()))
         // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
@@ -292,21 +305,30 @@ export class SoccerShootout extends Scene {
         // Draw a blue dome around the field
         let bt = Mat4.scale(100,100,100).times(Mat4.identity())
         this.shapes.ball.draw(context,program_state,bt,this.materials.dome_mat)
-        
-        
-        goalie_tr = Mat4.translation(0,3.5,0).times(goalie_tr).times(Mat4.scale(1,1,4))
-        defender_tr = Mat4.translation(0,3.5,0).times(defender_tr).times(Mat4.scale(1,1,4))
 
         let crossbar_tr = goal_tr.times(Mat4.translation(0, 0, 15)).times(Mat4.scale(8,0.5,0.5))
         let left_post_tr = goal_tr.times(Mat4.rotation(Math.PI / 2, 0, 1, 0)).times(Mat4.scale(4,0.5,0.5)).times(Mat4.translation(-4.6,0,-16))
         let right_post_tr = left_post_tr.times(Mat4.translation(0,0,32))
-        // this.shapes.obstacle.draw(context, program_state, crossbar_tr, this.materials.obstacle);
-        // this.shapes.obstacle.draw(context, program_state, left_post_tr, this.materials.obstacle);
-        // this.shapes.obstacle.draw(context, program_state, right_post_tr, this.materials.obstacle);
-        // this.shapes.obstacle.draw(context, program_state, defender_tr, this.materials.obstacle);
-        const { i, tr } = this.ball.update(dt, [goalie_tr, defender_tr, crossbar_tr, left_post_tr, right_post_tr]);
+
+        let collidable_obstacles = [crossbar_tr, left_post_tr, right_post_tr]
+        // console.log(this.level, this.level_obstaces[this.level], this.defenders)
+        if (this.level_obstaces[this.level]["goalies"] == 1){
+            goalie_tr = Mat4.translation(0,3.5,0).times(goalie_tr).times(Mat4.scale(1,1,4))
+            collidable_obstacles.push(goalie_tr)
+        }
+        for (let index = 0; index < this.defenders.length; index++){
+            collidable_obstacles.push(this.defenders[index].get_tr())
+        }
+
+        const { i, tr } = this.ball.update(dt, collidable_obstacles);
         if (i != null) {
             this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
+        }
+
+        if (this.ball.goal){
+            this.level += 1
+            this.level = this.level % 5
+            this.reset()
         }
     }
 
@@ -324,26 +346,6 @@ export class SoccerShootout extends Scene {
 
 
 
-    }
-    
-    moveDefender(dt) {
-        if (this.defender_pos[2]){
-            this.defender_pos[3] += dt 
-        }
-        else {
-            this.defender_pos[3] -= dt
-        }
-
-        if (this.defender_pos[3] > .25){
-            this.defender_pos[2] = false
-        }
-        if (this.defender_pos[3] < -.25){
-            this.defender_pos[2] = true
-        }
-
-        // console.log(this.defender_pos[3])
-
-        this.defender_pos[0] += this.defender_pos[3]
     }
 
     getRandomInt(min, max) {
