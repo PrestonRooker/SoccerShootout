@@ -1,7 +1,7 @@
 import {defs, tiny} from './examples/common.js';
 import Ball from './Ball.js';
 import { updateScore } from './text-manager.js';
-import Defender from './Defender.js'
+import { Defender, Goal_Defender } from './Defender.js'
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,

@@ -27,7 +27,7 @@ const Goalie = defs.Goalie =
         }
     }
 
-export default class Defender {
+class Defender {
 
     constructor(x_range, y_range, speed = 1.0, range = 0.25){
         this.x_range = x_range
@@ -97,3 +97,39 @@ export default class Defender {
     }
 
 }
+
+
+class Goal_Defender extends Defender {
+
+    constructor(inital_x, initial_y) {
+        super([0,0], [0,0])
+        this.x_pos = inital_x
+        this.y_pos = initial_y
+        this.inital_x = inital_x
+        this.initial_y = initial_y
+    }
+
+    follow_ball(dt, ball_position) {
+        if (this.x_pos < 8 && this.y_pos > -8){
+            if (ball_position[0] > goalie_pos[0]){
+                this.x_pos += dt * 5
+            }
+            else {
+                this.x_pos -= dt * 5
+            }
+        }
+    }
+
+    move(dt) {
+        this.x_pos = this.x_pos
+        this.y_pos = this.y_pos
+    }
+
+    reset_pos() {
+        this.x_pos = this.inital_x
+        this.y_pos = this.initial_y
+    }
+
+}
+
+export {Defender, Goal_Defender}
