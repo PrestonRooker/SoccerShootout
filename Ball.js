@@ -37,16 +37,15 @@ export default class Ball {
     }
 
     update(dt, obstacle_transforms) {
-        // Cap dt to prevent explosions
-        if (dt > 0.05)
-            dt = 0.05;
 
         if(this.goal==false){
             this.velocity = this.velocity.plus(vec4(0, -gravity, 0, 0).times(dt));
         }
         this.position = this.position.plus(this.velocity.times(dt));
 
-        if (this.position[1] < 0)
+        if (this.position[1] < 0 &&
+            this.position[0] > -50 && this.position[0] < 50 &&
+            this.position[2] > -50 && this.position[2] < 50)
         {
             // Friction
             if (this.velocity[0] ** 2 > 0 || this.velocity[2] ** 2 > 0) {
@@ -73,12 +72,12 @@ export default class Ball {
             // console.log(this.position)
         }
 
-        let blah = {};
+        let collided_face = {};
         for (const obs of obstacle_transforms) {
             const collision = this.getCollision(obs);
             if (collision == null)
                 continue;
-            blah = collision.face;
+            collided_face = collision.face;
             
             // console.log(collision.direction, collision.distance, collision.face.i);
             this.position = this.position.plus(collision.direction.times(collision.distance));
@@ -91,8 +90,10 @@ export default class Ball {
         this.roll(dt)
 
         return {
-            i: blah.i,
-            tr: blah.tr
+            debug: {
+                wireframe_index: collided_face.i,
+                transform: collided_face.tr
+            }
         };
     }
 
