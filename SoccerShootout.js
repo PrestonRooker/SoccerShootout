@@ -121,10 +121,15 @@ export class SoccerShootout extends Scene {
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/grass.jpg", "NEAREST")}),
             ball_mat: new Material(new defs.Phong_Shader(),
-                {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
+                {ambient: 0.7, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
             ball_texture: new Material(new defs.Textured_Phong(),
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/soccerball.png", "NEAREST")}),
+            
+            face_texture: new Material(new defs.Textured_Phong(),
+                {color: hex_color("#000000"), ambient: 0.9, diffusivity: 0.6, specularity: 0.1,
+                texture: new Texture("assets/angry2.png", "NEAREST")}),
+
             goalie_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("FCFCFC")}),
             arrow_mat: new Material(new defs.Phong_Shader(),
@@ -155,7 +160,6 @@ export class SoccerShootout extends Scene {
             goal: new defs.SoccerGoal(),
             net: new defs.OpenCube(),
             rectangle: new defs.Square(),
-            power: new defs.Subdivision_Sphere(4),
             obstacle: new defs.Cube(),
             goalie: new defs.Goalie(),
         };
@@ -232,6 +236,7 @@ export class SoccerShootout extends Scene {
         if (dt > 0.05)
             dt = 0.05;
 
+        //set power meter function
         let r = Math.sin((Math.PI/2)*t) + 1;
         this.power = r; 
 
@@ -247,6 +252,7 @@ export class SoccerShootout extends Scene {
         const obstacle_transform2 = Mat4.translation(-2, 0, 0)
             .times(Mat4.rotation(Math.PI / 4, 0, 1, 0));
 
+        //Set up aiming arrow
         let arrow_tr = Mat4.rotation(Math.PI,1,0,0).times(Mat4.identity())
         arrow_tr = Mat4.translation(0,0,-5).times(arrow_tr)
         arrow_tr = Mat4.rotation(this.arrow_ang_y,1,0,0).times(arrow_tr)
@@ -257,6 +263,7 @@ export class SoccerShootout extends Scene {
         // this.shapes.obstacle.draw(context, program_state, obstacle_transform, this.materials.obstacle);
         // this.shapes.obstacle.draw(context, program_state, obstacle_transform2, this.materials.obstacle);
         
+        //Set up power ball
         let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
         power_tr = Mat4.translation(20, 10, -45).times(power_tr);
         const r_n = r/2; 
@@ -265,11 +272,11 @@ export class SoccerShootout extends Scene {
         const blue = 0;
         let power_color = color(red, blue, green, 1);
         
+        //Draw initial objects in the scene
         this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
-        
         this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
-        this.shapes.power.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
+        this.shapes.ball.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
         
         // Transform Goal:
         const upright_tilt = Mat4.rotation(Math.PI / 2,1,0,0)
@@ -288,16 +295,45 @@ export class SoccerShootout extends Scene {
         this.shapes.net.draw(context, program_state, net_tr, this.materials.net_texture)
         this.shapes.goal.draw(context, program_state, goal_tr, this.materials.post_color)
         
-        //Draw Goalie
+        //Goalie
+        //set location of goalie
         let goalie_tr = Mat4.translation(this.goalie_pos[0], this.goalie_pos[1], this.goalie_pos[2]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
         this.goalie_tr = goalie_tr;
-        this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
+
+        //initialize the location of goalie's body
+        let head = goalie_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
+        let body = goalie_tr.times(Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)).times(Mat4.identity()));
+        let left_hand = goalie_tr.times(Mat4.translation(-1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
+        let right_hand = goalie_tr.times(Mat4.translation(1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
+
+        //draw the goalie
+        this.shapes.ball.draw(context, program_state, head, this.materials.face_texture);
+        this.shapes.ball.draw(context, program_state, left_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
+        this.shapes.ball.draw(context, program_state, right_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
+        this.shapes.cylinder.draw(context, program_state, body, this.materials.ball_mat.override(hex_color("#f25003")));
+        
         this.moveGoalie(dt)
         
+        //Defender
+        //set location
         let defender_tr = Mat4.translation(this.defender.x_pos, -3.5, this.defender.z_pos).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
-        this.shapes.goalie.draw(context, program_state, defender_tr, this.materials.goalie_mat);
+
+        //construct body parts
+        let d_head = defender_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
+        let d_body = defender_tr.times(Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)).times(Mat4.identity()));
+        let d_left_hand = defender_tr.times(Mat4.translation(-1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
+        let d_right_hand = defender_tr.times(Mat4.translation(1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
+
+        //draw defender 
+        this.shapes.ball.draw(context, program_state, d_head, this.materials.face_texture);
+        this.shapes.ball.draw(context, program_state, d_left_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
+        this.shapes.ball.draw(context, program_state, d_right_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
+        this.shapes.cylinder.draw(context, program_state, d_body, this.materials.ball_mat.override(hex_color("#00ffff")));
+
+       
         this.moveDefender(dt)
         
+
         // let threshold_translation = Mat4.translation(0, 0, -40).times(panel_scale.times(Mat4.identity()))
         // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
         
@@ -305,7 +341,7 @@ export class SoccerShootout extends Scene {
         let bt = Mat4.scale(domeRadius,domeRadius,domeRadius).times(Mat4.identity())
         this.shapes.ball.draw(context,program_state,bt,this.materials.dome_mat)
         
-        
+        //Model the goalie and defender simply so that collision detection is easier
         goalie_tr = Mat4.translation(0,3.5,0).times(goalie_tr).times(Mat4.scale(1,1,4))
         defender_tr = Mat4.translation(0,3.5,0).times(defender_tr).times(Mat4.scale(1,1,4))
 
@@ -324,7 +360,7 @@ export class SoccerShootout extends Scene {
             this.goals++;
             this.scored_this_possession = true;
         }
-
+        
         // Do not follow the ball with the camera if it goes out of bounds
         if (this.ball.position.dot(this.ball.position) < domeRadius ** 2)
         {
@@ -335,6 +371,7 @@ export class SoccerShootout extends Scene {
                 );
             program_state.set_camera(targetCamera.map((x, i) => Vector.from(program_state.camera_inverse[i]).mix(x, 0.05)));
         }
+        
 
         updateScore(this.goals);
     }
@@ -379,4 +416,6 @@ export class SoccerShootout extends Scene {
     rotation_angle (t, a, b, w) {
         return a + b * Math.sin(w * t)
     }
+
+    //getGoalieTransforms()
 }
