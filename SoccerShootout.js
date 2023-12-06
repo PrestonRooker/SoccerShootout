@@ -155,10 +155,10 @@ export class SoccerShootout extends Scene {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
         this.key_triggered_button("Aim Left", ["ArrowLeft"], () => this.arrow_ang_x = Math.min(this.arrow_ang_x + Math.PI/128,Math.PI/2));
         this.key_triggered_button("Aim Right", ["ArrowRight"], () => this.arrow_ang_x = Math.max(this.arrow_ang_x - Math.PI/128,-Math.PI/2));
-        this.new_line();
+        // this.new_line();
         this.key_triggered_button("Aim Up", ["ArrowUp"], () => this.arrow_ang_y = Math.min(this.arrow_ang_y + Math.PI/64,Math.PI/2));
         this.key_triggered_button("Aim Down", ["ArrowDown"], () => this.arrow_ang_y = Math.max(this.arrow_ang_y - Math.PI/64,0));
-        this.new_line();
+        // this.new_line();
         this.key_triggered_button("Kick", ["Enter"], () => {
             if(!this.already_kicked){
                 let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(50*this.power);
@@ -168,7 +168,7 @@ export class SoccerShootout extends Scene {
                 this.already_kicked = true
             }
         });
-        this.new_line();
+        // this.new_line();
         // this.key_triggered_button("Reset ball", ["r"], () => {
         //     //this.level = 0
         //     this.reset()
@@ -193,7 +193,8 @@ export class SoccerShootout extends Scene {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
         if (!context.scratchpad.controls) {
-            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            context.scratchpad.controls = new defs.Movement_Controls();
+            // this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
             // Define the global camera and projection matrices, which are stored in program_state.
             
             program_state.set_camera(this.initial_camera_location);

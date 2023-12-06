@@ -99,7 +99,7 @@ const Controls_Widget = widgets.Controls_Widget =
                 ".controls-widget table.control-box { width: 1080px; border:1px; margin:0; max-height:380px; " +
                 "transition:.5s; overflow-y:scroll; background:white }",
                 ".controls-widget table.control-box:hover { max-height:500px }",
-                ".controls-widget table.control-box td { overflow:hidden; border:1px; background:Black; border-radius:10px; width: 540px;}",
+                ".controls-widget table.control-box td { overflow:hidden; border:1px; background:Black; border-radius:10px; width: 1080px;}",
                 ".controls-widget table.control-box td .control-div { background: White; height:338px; padding: 5px 5px 5px 30px; }",
                 ".controls-widget table.control-box td * { background:transparent }",
                 ".controls-widget table.control-box .control-div td { border-radius:unset }",
