@@ -1,6 +1,6 @@
 import {defs, tiny} from './examples/common.js';
 import Ball from './Ball.js';
-import { updateScore, updateGoalText } from './text-manager.js';
+import { updateScore, updateGoalText, updateMisses, youLose, } from './text-manager.js';
 import Defender from './Defender.js'
 
 const {
@@ -78,6 +78,8 @@ export class SoccerShootout extends Scene {
         this.y_range = [-10, -38]
         this.goalie_pos = [0, -3.5, -38]
         this.level = 0
+        this.lost = false;
+        this.misses = 0;
         this.level_obstaces = [{"goalies": 0, "defenders": 0}, {"goalies": 1, "defenders": 0}, {"goalies": 1, "defenders": 1}, {"goalies": 1, "defenders": 2}, {"goalies": 1, "defenders": 3}]
         this.defenders = []
         // For collision debugging
@@ -166,15 +168,16 @@ export class SoccerShootout extends Scene {
             }
         });
         this.new_line();
-        this.key_triggered_button("Reset ball", ["r"], () => {
-            this.level = 0
-            this.reset()
-        })
+        // this.key_triggered_button("Reset ball", ["r"], () => {
+        //     //this.level = 0
+        //     this.reset()
+        // })
     }
 
     reset() {
         this.ball.reset(ball_initial_position)
         this.already_kicked = false
+        this.lost = false;
         this.goalie_pos = [0, -3.5, -38]
         this.defenders = []
         for (let index = 0; index < this.level_obstaces[this.level]["defenders"]; index++){
@@ -182,6 +185,7 @@ export class SoccerShootout extends Scene {
             this.defenders.push(defender)
         }
         this.scored_this_possession = null;
+        this.missed_this_possession = null; 
     }
 
     display(context, program_state) {
@@ -326,15 +330,35 @@ export class SoccerShootout extends Scene {
             this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
         }
 
-        if (this.ball.goal && this.scored_this_possession == null) {
-            this.goals++;
-            this.scored_this_possession = t;
+        if(this.ball.goal){
+            if (this.scored_this_possession == null) {
+                this.goals++;
+                this.misses = 0;
+                this.lost = false;
+                this.scored_this_possession = t;
+            }
+            if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
+                this.level += 1
+                this.level = this.level % 5
+                this.reset();
+            }
+        }   
+        if(!this.ball.goal){
+            if (this.missed_this_possession == null && this.already_kicked == true) {
+                this.misses += 1;
+                this.missed_this_possession = t;
+            }
+            if (this.missed_this_possession != null && t - this.missed_this_possession > 3) {
+                if(this.misses >3){
+                    this.lost = true;
+                    this.level = 0;
+                    this.misses = 0;
+                    //youLose(this.lost);
+                }
+                this.reset();
+            }
         }
-        if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
-            this.level += 1
-            this.level = this.level % 5
-            this.reset();
-        }
+        
         // Do not follow the ball with the camera if it goes out of bounds
         if (this.ball.position.dot(this.ball.position) < domeRadius ** 2)
         {
@@ -362,6 +386,8 @@ export class SoccerShootout extends Scene {
         this.shapes.ball.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
 
         updateGoalText(this.ball.goal);
+        updateMisses(this.misses);
+        //youLose(this.lost);
         updateScore(this.level);
     }
 

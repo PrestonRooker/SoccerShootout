@@ -7,3 +7,13 @@ export function updateGoalText(show) {
     const goalTextElement = document.getElementById('goal-text');
     goalTextElement.style.visibility = show ? "visible" : "hidden";
 }
+
+export function updateMisses(value) {
+    const missElement = document.getElementById('miss-text');
+    missElement.textContent = `Misses: ${value}`;
+}
+
+export function youLose(show) {
+    const missTextElement = document.getElementById('lose-text');
+    missTextElement.style.visibility = show ? "visible" : "hidden";
+}
