@@ -34,9 +34,7 @@ export default class Ball {
         this.velocity = this.velocity.plus(vec4(0, -gravity, 0, 0).times(dt));
         this.position = this.position.plus(this.velocity.times(dt));
 
-        if (this.position[1] < 0 &&
-            this.position[0] > -50 && this.position[0] < 50 &&
-            this.position[2] > -50 && this.position[2] < 50)
+        if (this.position[1] < 0)
         {
             // Friction
             if (this.velocity[0] ** 2 > 0 || this.velocity[2] ** 2 > 0) {
