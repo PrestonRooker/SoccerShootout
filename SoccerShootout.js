@@ -209,8 +209,9 @@ export class SoccerShootout extends Scene {
             dt = 0.05;
 
         //set power meter function
-        let r = Math.sin((Math.PI/2)*t) + 1;
+        let r = 0.8*Math.sin((Math.PI/2)*t) + 1.2; // goes from 0.4 to 2
         this.power = r; 
+
 
         const light_position = vec4(0, 100, 0, 1);
         program_state.lights = [new Light(light_position, hex_color("#fdfbd3"), 10000)];
@@ -397,6 +398,4 @@ export class SoccerShootout extends Scene {
     rotation_angle (t, a, b, w) {
         return a + b * Math.sin(w * t)
     }
-
-
 }
