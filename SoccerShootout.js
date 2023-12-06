@@ -215,14 +215,8 @@ export class SoccerShootout extends Scene {
         const light_position = vec4(0, 100, 0, 1);
         program_state.lights = [new Light(light_position, hex_color("#fdfbd3"), 10000)];
 
-        let S1 = Mat4.scale(50,0.4,50)
-        let T1 = Mat4.translation(0,-1.4,0)
-        let grass_tr = T1.times(S1.times(Mat4.identity()))
+        let grass_tr = Mat4.translation(0,-1.4,0).times(Mat4.scale(50,0.4,50).times(Mat4.identity()))
         
-        // const obstacle_transform = Mat4.translation(15, 0, 0)
-        //     .times(Mat4.scale(10, 1, 1));
-        // const obstacle_transform2 = Mat4.translation(-2, 0, 0)
-        //     .times(Mat4.rotation(Math.PI / 4, 0, 1, 0));
 
         //Set up aiming arrow
         let arrow_tr = Mat4.rotation(Math.PI,1,0,0).times(Mat4.identity())
@@ -230,10 +224,6 @@ export class SoccerShootout extends Scene {
         arrow_tr = Mat4.rotation(this.arrow_ang_y,1,0,0).times(arrow_tr)
         arrow_tr = Mat4.rotation(this.arrow_ang_x,0,1,0).times(arrow_tr)
         this.arrow_tr = arrow_tr
-        // console.log(this.arrow_ang_x)
-
-        // this.shapes.obstacle.draw(context, program_state, obstacle_transform, this.materials.obstacle);
-        // this.shapes.obstacle.draw(context, program_state, obstacle_transform2, this.materials.obstacle);
         
         //Set up power ball
         let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
@@ -284,7 +274,6 @@ export class SoccerShootout extends Scene {
             this.shapes.ball.draw(context, program_state, left_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
             this.shapes.ball.draw(context, program_state, right_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
             this.shapes.cylinder.draw(context, program_state, body, this.materials.ball_mat.override(hex_color("#f25003")));
-            //this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
             this.moveGoalie(dt)
         }
         
@@ -292,11 +281,6 @@ export class SoccerShootout extends Scene {
             this.defenders[index].move(dt)
             this.defenders[index].draw(context, program_state)
         }
-
-        
-
-        // let threshold_translation = Mat4.translation(0, 0, -40).times(panel_scale.times(Mat4.identity()))
-        // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
         
         // Draw a blue dome around the field
         let bt = Mat4.scale(domeRadius,domeRadius,domeRadius).times(Mat4.identity())
@@ -391,6 +375,8 @@ export class SoccerShootout extends Scene {
         updateScore(this.level);
     }
 
+
+    /////////////////Other functions///////////////////////////////
     moveGoalie(dt) {
         if (this.already_kicked && this.ball.position[0] < 8 && this.ball.position[0] > -8){
             if (this.ball.position[0] > this.goalie_pos[0]){
