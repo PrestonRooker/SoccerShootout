@@ -96,7 +96,7 @@ export class SoccerShootout extends Scene {
                 {ambient: 0.4, diffusivity: 0.8, specularity: 0, color: hex_color("#7CFC00")}),
             grass_texture: new Material(new defs.Textured_Phong(),
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
-                texture: new Texture("assets/grass.jpg", "NEAREST")}),
+                texture: new Texture("assets/grass4.png", "NEAREST")}),
             ball_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.7, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
             ball_texture: new Material(new defs.Textured_Phong(),
@@ -140,7 +140,7 @@ export class SoccerShootout extends Scene {
             obstacle: new defs.Cube(),
         };
 
-        // this.shapes.grass.arrays.texture_coord = this.shapes.grass.arrays.texture_coord.map(x => x.times(2));
+        this.shapes.grass.arrays.texture_coord = this.shapes.grass.arrays.texture_coord.map(x => x.times(4));
 
         this.power = 0;
         this.ball = new Ball(ball_initial_position)
