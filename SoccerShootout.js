@@ -338,12 +338,21 @@ export class SoccerShootout extends Scene {
         // Do not follow the ball with the camera if it goes out of bounds
         if (this.ball.position.dot(this.ball.position) < domeRadius ** 2)
         {
-            const targetCamera = Mat4.inverse(
+            let targetCamera = Mat4.inverse(
                 Mat4.translation(...this.ball.position)
                     .times(Mat4.rotation(-Math.PI / 12, 1, 0, 0))
                     .times(Mat4.translation(0, 0, 25))
                 );
             program_state.set_camera(targetCamera.map((x, i) => Vector.from(program_state.camera_inverse[i]).mix(x, 0.05)));
+        }
+        else{
+            //if call goes out of bounds, just slowly go back to the original position until ball respawns
+            let targetCamera = Mat4.inverse(
+                Mat4.translation(...ball_initial_position)
+                    .times(Mat4.rotation(-Math.PI / 12, 1, 0, 0))
+                    .times(Mat4.translation(0, -10, 25))
+                );
+            program_state.set_camera(targetCamera.map((x, i) => Vector.from(program_state.camera_inverse[i]).mix(x, 0.01)));
         }
         
 
