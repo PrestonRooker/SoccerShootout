@@ -17,3 +17,8 @@ export function youLose(show) {
     const missTextElement = document.getElementById('lose-text');
     missTextElement.style.visibility = show ? "visible" : "hidden";
 }
+
+export function updateLevels(value){
+    const levelElement = document.getElementById('level-text');
+    levelElement.textContent = `Level: ${value}`;
+}

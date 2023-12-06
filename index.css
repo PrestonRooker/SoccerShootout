@@ -22,6 +22,15 @@
 
 }
 
+#level-container {
+    background-color: black;
+    z-index: 1;
+    position: absolute;
+    right: 1.5rem;
+    top: 1rem;
+    border-radius: 1rem;
+}
+
 
 #score-text {
     color: white;
@@ -39,6 +48,13 @@
     text-align: center;
 }
 
+#level-text {
+    color: white;
+    margin: 0.4rem 0.8rem;
+    font-size: 1.4rem;
+    font-family: Poppins;
+    text-align: center;
+}
 
 #goal-text {
     color: lime;

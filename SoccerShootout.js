@@ -1,6 +1,6 @@
 import {defs, tiny} from './examples/common.js';
 import Ball from './Ball.js';
-import { updateScore, updateGoalText, updateMisses, youLose, } from './text-manager.js';
+import * as texteditor from './text-manager.js';
 import Defender from './Defender.js'
 
 const {
@@ -373,10 +373,11 @@ export class SoccerShootout extends Scene {
         //Draw ball
         this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)
 
-        updateGoalText(this.ball.goal);
-        updateMisses(this.misses);
+        texteditor.updateGoalText(this.ball.goal);
+        texteditor.updateMisses(this.misses);
+        texteditor.updateLevels(this.level)
         //youLose(this.lost);
-        updateScore(this.level);
+        texteditor.updateScore(this.level);
     }
 
 
