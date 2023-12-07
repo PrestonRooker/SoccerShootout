@@ -8,7 +8,7 @@ const {
 } = tiny;
 
 const ball_initial_position = vec4(0,15,0,1)
-const domeRadius = 100;
+const domeRadius = 300;
 
 const SoccerGoal = defs.SoccerGoal =
     class SoccerGoal extends Shape {
@@ -227,7 +227,7 @@ export class SoccerShootout extends Scene {
         program_state.lights = [new Light(light_position, hex_color("#fdfbd3"), 10000)];
         
         //Draw grass floor
-        let grass_tr = Mat4.translation(0,-51.4,0).times(Mat4.scale(100,50,100).times(Mat4.identity()))
+        let grass_tr = Mat4.translation(0,-51.4,0).times(Mat4.scale(domeRadius,50,domeRadius).times(Mat4.identity()))
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
 
         //Draw aiming arrow
