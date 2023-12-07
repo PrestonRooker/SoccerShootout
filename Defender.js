@@ -99,7 +99,6 @@ class Ball_Chaser extends Defender {
     }
 
     move(dt, ball_position) {
-        console.log("Moving", this.x_pos)
         if (this.x_pos < 8 && this.x_pos > -8){
             if (ball_position[0] > this.x_pos){
                 this.x_pos += dt * 5

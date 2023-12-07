@@ -196,7 +196,6 @@ export class SoccerShootout extends Scene {
             let speed_bump = new Speed_Bump(this.x_range, this.y_range)
             this.speed_bumps.push(speed_bump)
         }
-        console.log("SPEED BUMPS", this.speed_bumps)
         this.scored_this_possession = null;
         this.missed_this_possession = null; 
     }
@@ -304,7 +303,6 @@ export class SoccerShootout extends Scene {
             this.defenders[index].draw(context, program_state)
         }
 
-        console.log(this.speed_bumps)
         for (let index = 0; index < this.speed_bumps.length; index++){
             this.speed_bumps[index].draw(context, program_state)
         }
