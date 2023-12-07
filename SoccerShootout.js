@@ -372,10 +372,10 @@ export class SoccerShootout extends Scene {
         }   
         if(!this.ball.goal){
             if (this.missed_this_possession == null && this.already_kicked == true) {
-                this.misses += 1;
                 this.missed_this_possession = t;
             }
             if (this.missed_this_possession != null && t - this.missed_this_possession > 3) {
+                this.misses += 1;
                 if(this.misses > 3){
                     this.lost = true;
                     this.level = 0;
