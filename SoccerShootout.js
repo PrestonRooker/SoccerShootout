@@ -130,6 +130,8 @@ export class SoccerShootout extends Scene {
             dome_mat : new Material(new defs.Textured_Phong(),
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/sky12.jpg", "NEAREST")}),
+            speed_bump_mat: new Material(new defs.Phong_Shader(),
+                {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("FCFCFC")}),
         }       
 
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
@@ -300,18 +302,18 @@ export class SoccerShootout extends Scene {
         
         for (let index = 0; index < this.defenders.length; index++){
             this.defenders[index].move(dt)
-            this.defenders[index].draw(context, program_state)
+            this.defenders[index].draw(context, program_state, this.materials)
         }
 
         for (let index = 0; index < this.speed_bumps.length; index++){
-            this.speed_bumps[index].draw(context, program_state)
+            this.speed_bumps[index].draw(context, program_state, this.materials)
         }
 
         for (let index = 0; index < this.ball_chasers.length; index++){
             if (this.already_kicked){
                 this.ball_chasers[index].move(dt, this.ball.position)
             }
-            this.ball_chasers[index].draw(context, program_state)
+            this.ball_chasers[index].draw(context, program_state, this.materials)
         }
 
         

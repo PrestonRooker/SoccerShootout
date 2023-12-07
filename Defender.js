@@ -16,15 +16,6 @@ class Defender {
         this.movement_change = 0
         this.speed = speed
         this.range = range
-        this.materials = {             
-            goalie_mat: new Material(new defs.Phong_Shader(),
-            {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("FCFCFC")}),
-            ball_mat: new Material(new defs.Phong_Shader(),
-                {ambient: 0.7, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
-            face_texture: new Material(new defs.Textured_Phong(),
-                {color: hex_color("#000000"), ambient: 0.9, diffusivity: 0.6, specularity: 0.1,
-                texture: new Texture("assets/angry2.png", "NEAREST")}),
-        }
 
         this.shapes = {
             ball: new defs.Subdivision_Sphere(4),
@@ -32,7 +23,8 @@ class Defender {
         }
     }
 
-    draw(context, program_state) {
+    // materials should contain "face_texture" and "ball_mat"
+    draw(context, program_state, materials) {
         this.defender_tr = Mat4.translation(this.x_pos, -3.5, this.y_pos).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
         // console.log("Drawing", this.defender_tr)
         let d_head = this.defender_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
@@ -41,10 +33,10 @@ class Defender {
         let d_right_hand = this.defender_tr.times(Mat4.translation(1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
 
         //draw defender 
-        this.shapes.ball.draw(context, program_state, d_head, this.materials.face_texture);
-        this.shapes.ball.draw(context, program_state, d_left_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
-        this.shapes.ball.draw(context, program_state, d_right_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
-        this.shapes.cylinder.draw(context, program_state, d_body, this.materials.ball_mat.override(hex_color("#00ffff")));
+        this.shapes.ball.draw(context, program_state, d_head, materials.face_texture);
+        this.shapes.ball.draw(context, program_state, d_left_hand, materials.ball_mat.override(hex_color("#f1c27d")));
+        this.shapes.ball.draw(context, program_state, d_right_hand, materials.ball_mat.override(hex_color("#f1c27d")));
+        this.shapes.cylinder.draw(context, program_state, d_body, materials.ball_mat.override(hex_color("#00ffff")));
         this.defender_tr = Mat4.translation(0,3.5,0).times(this.defender_tr).times(Mat4.scale(1,1,4))
     }
 
@@ -119,18 +111,15 @@ class Speed_Bump {
         this.defender_tr = Mat4.identity
         this.x_pos = this.getRandomInt(this.x_range[0], this.x_range[1])
         this.y_pos = this.getRandomInt(this.y_range[0], this.y_range[1])
-        this.materials = {             
-            speed_bump_mat: new Material(new defs.Phong_Shader(),
-            {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("FCFCFC")}),
-        }
         this.shapes = {
             cylinder: new defs.Capped_Cylinder(30, 30),
         }
     }
 
-    draw(context, program_state){
+    // materials should contain "speed_bump_mat"
+    draw(context, program_state, materials) {
         this.bump_tr = Mat4.translation(this.x_pos, -0.75, this.y_pos).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0)).times(Mat4.scale(0.75,0.75,3))
-        this.shapes.cylinder.draw(context, program_state, this.bump_tr, this.materials.speed_bump_mat.override(hex_color("#f1c27d")));
+        this.shapes.cylinder.draw(context, program_state, this.bump_tr, materials.speed_bump_mat.override(hex_color("#f1c27d")));
     }
 
     getRandomInt(min, max) {
