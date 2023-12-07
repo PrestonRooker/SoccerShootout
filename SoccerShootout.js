@@ -178,7 +178,6 @@ export class SoccerShootout extends Scene {
     reset() {
         this.ball.reset(ball_initial_position)
         this.already_kicked = false
-        this.lost = false;
         this.goalie_pos = [0, -3.5, -38]
         this.defenders = []
         for (let index = 0; index < this.level_obstaces[this.level]["defenders"]; index++){
@@ -341,11 +340,11 @@ export class SoccerShootout extends Scene {
                 this.missed_this_possession = t;
             }
             if (this.missed_this_possession != null && t - this.missed_this_possession > 3) {
-                if(this.misses >3){
+                if(this.misses > 3){
                     this.lost = true;
                     this.level = 0;
                     this.misses = 0;
-                    //youLose(this.lost);
+                    //texteditor.youLose(this.lost);
                 }
                 this.reset();
             }
@@ -377,7 +376,7 @@ export class SoccerShootout extends Scene {
         texteditor.updateGoalText(this.ball.goal);
         texteditor.updateMisses(this.misses);
         texteditor.updateLevels(this.level)
-        //youLose(this.lost);
+        texteditor.youLose(this.lost);
         texteditor.updateScore(this.level);
     }
 
