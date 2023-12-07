@@ -1,7 +1,7 @@
 import {defs, tiny} from './examples/common.js';
 import Ball from './Ball.js';
 import * as texteditor from './text-manager.js';
-import Defender from './Defender.js'
+import { Defender, Ball_Chaser, Speed_Bump } from './Defender.js'
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
@@ -80,8 +80,10 @@ export class SoccerShootout extends Scene {
         this.level = 0
         this.lost = false;
         this.misses = 0;
-        this.level_obstaces = [{"goalies": 0, "defenders": 0}, {"goalies": 1, "defenders": 0}, {"goalies": 1, "defenders": 1}, {"goalies": 1, "defenders": 2}, {"goalies": 1, "defenders": 3}]
+        this.level_obstaces = [{"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 1}, {"goalies": 1, "defenders": 0, "ball_chasers": 1}, {"goalies": 1, "defenders": 1, "ball_chasers": 0}, {"goalies": 1, "defenders": 1, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 2}]
         this.defenders = []
+        this.ball_chasers = []
+        this.speed_bumps = []
         // For collision debugging
         this.wireframes = [
             new Wireframe([-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [-1, -1, 1]),
@@ -180,10 +182,21 @@ export class SoccerShootout extends Scene {
         this.already_kicked = false
         this.goalie_pos = [0, -3.5, -38]
         this.defenders = []
+        this.ball_chasers = []
+        this.speed_bumps = []
         for (let index = 0; index < this.level_obstaces[this.level]["defenders"]; index++){
             let defender = new Defender(this.x_range, this.y_range)
             this.defenders.push(defender)
         }
+        for (let index = 0; index < this.level_obstaces[this.level]["ball_chasers"]; index++){
+            let ball_chaser = new Ball_Chaser(this.x_range, this.y_range)
+            this.ball_chasers.push(ball_chaser)
+        }
+        for (let index = 0; index < this.level_obstaces[this.level]["speed_bumps"]; index++){
+            let speed_bump = new Speed_Bump(this.x_range, this.y_range)
+            this.speed_bumps.push(speed_bump)
+        }
+        console.log("SPEED BUMPS", this.speed_bumps)
         this.scored_this_possession = null;
         this.missed_this_possession = null; 
     }
@@ -198,6 +211,8 @@ export class SoccerShootout extends Scene {
             
             program_state.set_camera(this.initial_camera_location);
         }
+
+        
         
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, .1, 1000);
@@ -288,6 +303,19 @@ export class SoccerShootout extends Scene {
             this.defenders[index].move(dt)
             this.defenders[index].draw(context, program_state)
         }
+
+        console.log(this.speed_bumps)
+        for (let index = 0; index < this.speed_bumps.length; index++){
+            this.speed_bumps[index].draw(context, program_state)
+        }
+
+        for (let index = 0; index < this.ball_chasers.length; index++){
+            if (this.already_kicked){
+                this.ball_chasers[index].move(dt, this.ball.position)
+            }
+            this.ball_chasers[index].draw(context, program_state)
+        }
+
         
         // Draw a blue dome around the field
         let bt = Mat4.scale(domeRadius,domeRadius,domeRadius).times(Mat4.identity())
@@ -315,6 +343,14 @@ export class SoccerShootout extends Scene {
             collidable_obstacles.push(this.defenders[index].get_tr())
             restitution_coefs.push(0.8)
         }
+        for (let index = 0; index < this.ball_chasers.length; index++){
+            collidable_obstacles.push(this.ball_chasers[index].get_tr())
+            restitution_coefs.push(0.8)
+        }
+        for (let index = 0; index < this.speed_bumps.length; index++){
+            collidable_obstacles.push(this.speed_bumps[index].get_tr())
+            restitution_coefs.push(0.8)
+        }
 
         const { i, tr } = this.ball.update(dt, collidable_obstacles, restitution_coefs);
         if (i != null) {
@@ -330,7 +366,7 @@ export class SoccerShootout extends Scene {
             }
             if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
                 this.level += 1
-                this.level = this.level % 5
+                this.level = this.level % this.level_obstaces.length
                 this.reset();
             }
         }   
