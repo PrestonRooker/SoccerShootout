@@ -350,9 +350,11 @@ export class SoccerShootout extends Scene {
             restitution_coefs.push(0.8)
         }
 
-        const { i, tr } = this.ball.update(dt, collidable_obstacles, restitution_coefs);
-        if (i != null) {
-            this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
+        for(let j = 0; j < 15; j++){
+            const { i, tr } = this.ball.update(dt/15, collidable_obstacles, restitution_coefs);
+            if (i != null) {
+                this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
+            }
         }
 
         if(this.ball.goal){
