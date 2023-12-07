@@ -1,31 +1,8 @@
 import {defs, tiny} from './examples/common.js';
 
-const { Vector3, vec3, Vector4, vec4, Mat4, Shape, Material, hex_color } = tiny;
+const { Vector3, vec3, Vector4, vec4, Mat4, Shape, Material, hex_color, Texture } = tiny;
 
 const gravity = 20;
-
-const Goalie = defs.Goalie =
-    class Goalie extends Shape{
-        constructor(){
-            super("position","normal","texture_coord");
-            // defs.Closed_Cone.insert_transformed_copy_into(this,[10,30],
-            //     Mat4.translation(0,0,7).times(Mat4.scale(0.8,0.8,0.8)))
-            defs.Capped_Cylinder.insert_transformed_copy_into(this,[30,30],
-                Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)))
-            // Sphere on top of the Cylinder
-            const sphere_scale = Mat4.scale(1, 1, 1); // Adjust the scale as needed
-            const sphere_translation = Mat4.translation(0, 0, 6.6); // Adjust the position above the cylinder
-            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], sphere_translation.times(sphere_scale));
-            // Sphere on the left side of the Cylinder
-            const left_sphere_scale = Mat4.scale(0.5, 0.5, 0.5); // Adjust the scale as needed
-            const left_sphere_translation = Mat4.translation(-1.5, 0, 4); // Adjust the position
-            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], left_sphere_translation.times(left_sphere_scale));
-            // Sphere on the right side of the Cylinder
-            const right_sphere_scale = Mat4.scale(0.5, 0.5, 0.5); // Adjust the scale as needed
-            const right_sphere_translation = Mat4.translation(1.5, 0, 4); // Adjust the position
-            defs.Subdivision_Sphere.insert_transformed_copy_into(this, [4], right_sphere_translation.times(right_sphere_scale));
-        }
-    }
 
 class Defender {
 
@@ -41,17 +18,33 @@ class Defender {
         this.range = range
         this.materials = {             
             goalie_mat: new Material(new defs.Phong_Shader(),
-            {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("FCFCFC")})
+            {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("FCFCFC")}),
+            ball_mat: new Material(new defs.Phong_Shader(),
+                {ambient: 0.7, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
+            face_texture: new Material(new defs.Textured_Phong(),
+                {color: hex_color("#000000"), ambient: 0.9, diffusivity: 0.6, specularity: 0.1,
+                texture: new Texture("assets/angry2.png", "NEAREST")}),
         }
 
         this.shapes = {
-            goalie: new defs.Goalie(),
+            ball: new defs.Subdivision_Sphere(4),
+            cylinder: new defs.Capped_Cylinder(30, 30),
         }
     }
 
     draw(context, program_state) {
         this.defender_tr = Mat4.translation(this.x_pos, -3.5, this.y_pos).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
-        this.shapes.goalie.draw(context, program_state, this.defender_tr, this.materials.goalie_mat);
+        // console.log("Drawing", this.defender_tr)
+        let d_head = this.defender_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
+        let d_body = this.defender_tr.times(Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)).times(Mat4.identity()));
+        let d_left_hand = this.defender_tr.times(Mat4.translation(-1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
+        let d_right_hand = this.defender_tr.times(Mat4.translation(1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
+
+        //draw defender 
+        this.shapes.ball.draw(context, program_state, d_head, this.materials.face_texture);
+        this.shapes.ball.draw(context, program_state, d_left_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
+        this.shapes.ball.draw(context, program_state, d_right_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
+        this.shapes.cylinder.draw(context, program_state, d_body, this.materials.ball_mat.override(hex_color("#00ffff")));
         this.defender_tr = Mat4.translation(0,3.5,0).times(this.defender_tr).times(Mat4.scale(1,1,4))
     }
 
@@ -71,8 +64,8 @@ class Defender {
             this.move_right = true
         }
 
-        console.log(this.movement_change)
-        console.log(this.move_right)
+        // console.log(this.movement_change)
+        // console.log(this.move_right)
 
         // console.log(this.defender_pos[3])
 
@@ -99,19 +92,16 @@ class Defender {
 }
 
 
-class Goal_Defender extends Defender {
+class Ball_Chaser extends Defender {
 
-    constructor(inital_x, initial_y) {
-        super([0,0], [0,0])
-        this.x_pos = inital_x
-        this.y_pos = initial_y
-        this.inital_x = inital_x
-        this.initial_y = initial_y
+    constructor(x_range, y_range) {
+        super(x_range, y_range)
     }
 
-    follow_ball(dt, ball_position) {
-        if (this.x_pos < 8 && this.y_pos > -8){
-            if (ball_position[0] > goalie_pos[0]){
+    move(dt, ball_position) {
+        console.log("Moving", this.x_pos)
+        if (this.x_pos < 8 && this.x_pos > -8){
+            if (ball_position[0] > this.x_pos){
                 this.x_pos += dt * 5
             }
             else {
@@ -120,16 +110,40 @@ class Goal_Defender extends Defender {
         }
     }
 
-    move(dt) {
-        this.x_pos = this.x_pos
-        this.y_pos = this.y_pos
+}
+
+class Speed_Bump {
+
+    constructor(x_range, y_range) {
+        this.x_range = x_range
+        this.y_range = y_range
+        this.defender_tr = Mat4.identity
+        this.x_pos = this.getRandomInt(this.x_range[0], this.x_range[1])
+        this.y_pos = this.getRandomInt(this.y_range[0], this.y_range[1])
+        this.materials = {             
+            speed_bump_mat: new Material(new defs.Phong_Shader(),
+            {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("FCFCFC")}),
+        }
+        this.shapes = {
+            cylinder: new defs.Capped_Cylinder(30, 30),
+        }
     }
 
-    reset_pos() {
-        this.x_pos = this.inital_x
-        this.y_pos = this.initial_y
+    draw(context, program_state){
+        this.bump_tr = Mat4.translation(this.x_pos, -0.75, this.y_pos).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0)).times(Mat4.scale(0.75,0.75,3))
+        this.shapes.cylinder.draw(context, program_state, this.bump_tr, this.materials.speed_bump_mat.override(hex_color("#f1c27d")));
+    }
+
+    getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+    }
+
+    get_tr() {
+        return this.bump_tr
     }
 
 }
 
-export {Defender, Goal_Defender}
+export {Defender, Ball_Chaser, Speed_Bump}

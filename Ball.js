@@ -6,14 +6,7 @@ const gravity = 20;
 
 export default class Ball {
     constructor(initialPosition) {
-        this.position = initialPosition;
-        this.velocity = vec4(0, 0, 0, 0);
-        this.radius = 1;
-        this.goal = false;
-        this.roll_tr = Mat4.identity()
-        this.roll_ang_x = 0
-        this.roll_ang_z = 0
-        this.roll_sp = 0
+        this.reset(initialPosition);
     }
 
     reset(initialPosition){
@@ -36,11 +29,9 @@ export default class Ball {
         }
     }
 
-    update(dt, obstacle_transforms) {
+    update(dt, obstacle_transforms, restitution_coefs) {
 
-        if(this.goal==false){
-            this.velocity = this.velocity.plus(vec4(0, -gravity, 0, 0).times(dt));
-        }
+        this.velocity = this.velocity.plus(vec4(0, -gravity, 0, 0).times(dt));
         this.position = this.position.plus(this.velocity.times(dt));
 
         if (this.position[1] < 0 &&
@@ -63,8 +54,6 @@ export default class Ball {
 
         if (this.position[0] > -8 && this.position[0] < 8 && this.position[2] < -40 && this.position[2] > -45 && this.position[1] < 6){
             this.goal = true
-            this.velocity = vec4(0, 0, 0, 0);
-            // this.position = vec4(this.position[0],this.position[1],this.position[2],this.position[3])
         }
 
         if (this.goal) {
@@ -73,7 +62,7 @@ export default class Ball {
         }
 
         let collided_face = {};
-        for (const obs of obstacle_transforms) {
+        for (const [obs, restitution] of zip(obstacle_transforms, restitution_coefs)) {
             const collision = this.getCollision(obs);
             if (collision == null)
                 continue;
@@ -84,7 +73,7 @@ export default class Ball {
 
             // Reflect velocity across the vector (coeff of restitution = 0.8)
             const velocityProjected = collision.direction.times(collision.direction.dot(this.velocity) / collision.direction.dot(collision.direction));
-            this.velocity = this.velocity.minus(velocityProjected.times(1.8));
+            this.velocity = this.velocity.minus(velocityProjected.times(1 + restitution));
         }
 
         this.roll(dt)
@@ -192,6 +181,12 @@ export default class Ball {
     get transform() {
         return Mat4.translation(...this.position).times(this.roll_tr);
     }
+}
+
+function zip(a, b) {
+    return a.map(function(el, i) {
+        return [el, b[i]];
+    });
 }
 
 // A bounding box should be an array of two points

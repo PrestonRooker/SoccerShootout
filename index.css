@@ -20,6 +20,18 @@
     text-align: center;
 }
 
+#goal-text {
+    color: lime;
+    position: absolute;
+    left: 50%;
+    text-align: center;
+    top: 250px;
+    visibility: hidden;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    font-family: Poppins;
+}
+
 @font-face {
     font-family: Poppins;
     font-weight: bold;
