@@ -1,6 +1,6 @@
 import {defs, tiny} from './examples/common.js';
 import Ball from './Ball.js';
-import { updateScore, updateGoalText } from './text-manager.js';
+import * as texteditor from './text-manager.js';
 import { Defender, Ball_Chaser, Speed_Bump } from './Defender.js'
 
 const {
@@ -78,6 +78,8 @@ export class SoccerShootout extends Scene {
         this.y_range = [-10, -38]
         this.goalie_pos = [0, -3.5, -38]
         this.level = 0
+        this.lost = false;
+        this.misses = 0;
         this.level_obstaces = [{"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 1}, {"goalies": 1, "defenders": 0, "ball_chasers": 1}, {"goalies": 1, "defenders": 1, "ball_chasers": 0}, {"goalies": 1, "defenders": 1, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 2}]
         this.defenders = []
         this.ball_chasers = []
@@ -98,7 +100,7 @@ export class SoccerShootout extends Scene {
                 {ambient: 0.4, diffusivity: 0.8, specularity: 0, color: hex_color("#7CFC00")}),
             grass_texture: new Material(new defs.Textured_Phong(),
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
-                texture: new Texture("assets/grass.jpg", "NEAREST")}),
+                texture: new Texture("assets/grass4.png", "NEAREST")}),
             ball_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.7, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
             ball_texture: new Material(new defs.Textured_Phong(),
@@ -140,7 +142,10 @@ export class SoccerShootout extends Scene {
             net: new defs.OpenCube(),
             rectangle: new defs.Square(),
             obstacle: new defs.Cube(),
+            circle: new defs.Regular_2D_Polygon(30,30),
         };
+
+        this.shapes.grass.arrays.texture_coord = this.shapes.grass.arrays.texture_coord.map(x => x.times(4));
 
         this.power = 0;
         this.ball = new Ball(ball_initial_position)
@@ -150,13 +155,13 @@ export class SoccerShootout extends Scene {
 
     make_control_panel() {
         // Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-        this.key_triggered_button("Aim Left", ["ArrowLeft"], () => this.arrow_ang_x = Math.min(this.arrow_ang_x + Math.PI/48,Math.PI/2));
-        this.key_triggered_button("Aim Right", ["ArrowRight"], () => this.arrow_ang_x = Math.max(this.arrow_ang_x - Math.PI/48,-Math.PI/2));
-        this.new_line();
-        this.key_triggered_button("Aim Up", ["ArrowUp"], () => this.arrow_ang_y = Math.min(this.arrow_ang_y + Math.PI/48,Math.PI/2));
-        this.key_triggered_button("Aim Down", ["ArrowDown"], () => this.arrow_ang_y = Math.max(this.arrow_ang_y - Math.PI/48,0));
-        this.new_line();
-        this.key_triggered_button("Kick", ["m"], () => {
+        this.key_triggered_button("Aim Left", ["ArrowLeft"], () => this.arrow_ang_x = Math.min(this.arrow_ang_x + Math.PI/128,Math.PI/2));
+        this.key_triggered_button("Aim Right", ["ArrowRight"], () => this.arrow_ang_x = Math.max(this.arrow_ang_x - Math.PI/128,-Math.PI/2));
+        // this.new_line();
+        this.key_triggered_button("Aim Up", ["ArrowUp"], () => this.arrow_ang_y = Math.min(this.arrow_ang_y + Math.PI/64,Math.PI/2));
+        this.key_triggered_button("Aim Down", ["ArrowDown"], () => this.arrow_ang_y = Math.max(this.arrow_ang_y - Math.PI/64,0));
+        // this.new_line();
+        this.key_triggered_button("Kick", ["Enter"], () => {
             if(!this.already_kicked){
                 let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(50*this.power);
                 this.ball.velocity[0] += dir_vec[0];
@@ -165,11 +170,11 @@ export class SoccerShootout extends Scene {
                 this.already_kicked = true
             }
         });
-        this.new_line();
-        this.key_triggered_button("Reset ball", ["r"], () => {
-            this.level = 0
-            this.reset()
-        })
+        // this.new_line();
+        // this.key_triggered_button("Reset ball", ["r"], () => {
+        //     //this.level = 0
+        //     this.reset()
+        // })
     }
 
     reset() {
@@ -193,13 +198,15 @@ export class SoccerShootout extends Scene {
         }
         console.log("SPEED BUMPS", this.speed_bumps)
         this.scored_this_possession = null;
+        this.missed_this_possession = null; 
     }
 
     display(context, program_state) {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
         if (!context.scratchpad.controls) {
-            this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            context.scratchpad.controls = new defs.Movement_Controls();
+            // this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
             // Define the global camera and projection matrices, which are stored in program_state.
             
             program_state.set_camera(this.initial_camera_location);
@@ -217,41 +224,37 @@ export class SoccerShootout extends Scene {
         if (dt > 0.05)
             dt = 0.05;
 
-        //set power meter function
-        let r = Math.sin((Math.PI/2)*t) + 1;
-        this.power = r; 
-
         const light_position = vec4(0, 100, 0, 1);
         program_state.lights = [new Light(light_position, hex_color("#fdfbd3"), 10000)];
-
-        let S1 = Mat4.scale(50,0.4,50)
-        let T1 = Mat4.translation(0,-1.4,0)
-        let grass_tr = T1.times(S1.times(Mat4.identity()))
         
-        // const obstacle_transform = Mat4.translation(15, 0, 0)
-        //     .times(Mat4.scale(10, 1, 1));
-        // const obstacle_transform2 = Mat4.translation(-2, 0, 0)
-        //     .times(Mat4.rotation(Math.PI / 4, 0, 1, 0));
+        //Draw grass floor
+        let grass_tr = Mat4.translation(0,-51.4,0).times(Mat4.scale(100,50,100).times(Mat4.identity()))
+        this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
 
-        //Set up aiming arrow
+        //Draw aiming arrow
         let arrow_tr = Mat4.rotation(Math.PI,1,0,0).times(Mat4.identity())
         arrow_tr = Mat4.translation(0,0,-5).times(arrow_tr)
         arrow_tr = Mat4.rotation(this.arrow_ang_y,1,0,0).times(arrow_tr)
         arrow_tr = Mat4.rotation(this.arrow_ang_x,0,1,0).times(arrow_tr)
         this.arrow_tr = arrow_tr
-        // console.log(this.arrow_ang_x)
-
-        // this.shapes.obstacle.draw(context, program_state, obstacle_transform, this.materials.obstacle);
-        // this.shapes.obstacle.draw(context, program_state, obstacle_transform2, this.materials.obstacle);
+        this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
         
-        //Set up power ball
+        //set power meter function
+        let r = this.power;
+        if(!this.already_kicked){
+            r = 0.8*Math.sin((Math.PI/2)*t) + 1.2; // goes from 0.4 to 2
+        }
+        this.power = r;
+
+        //Draw power meter circle
         let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
-        power_tr = Mat4.translation(20, 10, -45).times(power_tr);
+        power_tr = Mat4.translation(0, -0.9, 0).times(Mat4.rotation(Math.PI/2,1,0,0)).times(power_tr);
         const r_n = r/2; 
         const red = r_n;
         const green = 1-r_n;
         const blue = 0;
         let power_color = color(red, blue, green, 1);
+        this.shapes.circle.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
         
         
         // Transform Goal:
@@ -283,7 +286,7 @@ export class SoccerShootout extends Scene {
             goalie_tr = Mat4.translation(this.goalie_pos[0], this.goalie_pos[1], this.goalie_pos[2]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
             this.goalie_tr = goalie_tr;
              //initialize the location of goalie's body
-            let head = goalie_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
+             let head = goalie_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
             let body = goalie_tr.times(Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)).times(Mat4.identity()));
             let left_hand = goalie_tr.times(Mat4.translation(-1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
             let right_hand = goalie_tr.times(Mat4.translation(1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
@@ -293,7 +296,6 @@ export class SoccerShootout extends Scene {
             this.shapes.ball.draw(context, program_state, left_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
             this.shapes.ball.draw(context, program_state, right_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
             this.shapes.cylinder.draw(context, program_state, body, this.materials.ball_mat.override(hex_color("#f25003")));
-            //this.shapes.goalie.draw(context, program_state, goalie_tr, this.materials.goalie_mat);
             this.moveGoalie(dt)
         }
         
@@ -314,11 +316,6 @@ export class SoccerShootout extends Scene {
             this.ball_chasers[index].draw(context, program_state)
         }
 
-
-        
-
-        // let threshold_translation = Mat4.translation(0, 0, -40).times(panel_scale.times(Mat4.identity()))
-        // this.shapes.rectangle.draw(context, program_state, threshold_translation, this.materials.post_color)
         
         // Draw a blue dome around the field
         let bt = Mat4.scale(domeRadius,domeRadius,domeRadius).times(Mat4.identity())
@@ -360,36 +357,67 @@ export class SoccerShootout extends Scene {
             this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
         }
 
-        if (this.ball.goal && this.scored_this_possession == null) {
-            this.goals++;
-            this.scored_this_possession = t;
+        if(this.ball.goal){
+            if (this.scored_this_possession == null) {
+                this.goals++;
+                this.misses = 0;
+                this.lost = false;
+                this.scored_this_possession = t;
+            }
+            if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
+                this.level += 1
+                this.level = this.level % this.level_obstaces.length
+                this.reset();
+            }
+        }   
+        if(!this.ball.goal){
+            if (this.missed_this_possession == null && this.already_kicked == true) {
+                this.misses += 1;
+                this.missed_this_possession = t;
+            }
+            if (this.missed_this_possession != null && t - this.missed_this_possession > 3) {
+                if(this.misses > 3){
+                    this.lost = true;
+                    this.level = 0;
+                    this.misses = 0;
+                    //texteditor.youLose(this.lost);
+                }
+                this.reset();
+            }
         }
-        if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
-            this.level += 1
-            this.level = this.level % this.level_obstaces.length
-            this.reset();
-        }
+        
         // Do not follow the ball with the camera if it goes out of bounds
         if (this.ball.position.dot(this.ball.position) < domeRadius ** 2)
         {
-            const targetCamera = Mat4.inverse(
+            let targetCamera = Mat4.inverse(
                 Mat4.translation(...this.ball.position)
                     .times(Mat4.rotation(-Math.PI / 12, 1, 0, 0))
                     .times(Mat4.translation(0, 0, 25))
                 );
             program_state.set_camera(targetCamera.map((x, i) => Vector.from(program_state.camera_inverse[i]).mix(x, 0.05)));
         }
+        else{
+            //if call goes out of bounds, just slowly go back to the original position until ball respawns
+            let targetCamera = Mat4.inverse(
+                Mat4.translation(...ball_initial_position)
+                    .times(Mat4.rotation(-Math.PI / 12, 1, 0, 0))
+                    .times(Mat4.translation(0, -10, 25))
+                );
+            program_state.set_camera(targetCamera.map((x, i) => Vector.from(program_state.camera_inverse[i]).mix(x, 0.01)));
+        }
         
-
-        this.shapes.arrow.draw(context, program_state, arrow_tr, this.materials.arrow_mat)
+        //Draw ball
         this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)
-        this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
-        this.shapes.ball.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
 
-        updateGoalText(this.ball.goal);
-        updateScore(this.level);
+        texteditor.updateGoalText(this.ball.goal);
+        texteditor.updateMisses(this.misses);
+        texteditor.updateLevels(this.level)
+        texteditor.youLose(this.lost);
+        texteditor.updateScore(this.level);
     }
 
+
+    /////////////////Other functions///////////////////////////////
     moveGoalie(dt) {
         if (this.already_kicked && this.ball.position[0] < 8 && this.ball.position[0] > -8){
             if (this.ball.position[0] > this.goalie_pos[0]){
@@ -410,6 +438,4 @@ export class SoccerShootout extends Scene {
     rotation_angle (t, a, b, w) {
         return a + b * Math.sin(w * t)
     }
-
-
 }
