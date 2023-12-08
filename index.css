@@ -43,15 +43,16 @@ html, body {
     position: absolute;
     left: 50%;
     text-align: center;
+    margin: 0;
 }
 #goal-text {
     color: lime;
-    top: 250px;
+    top: 50%;
     font-size: 4rem;
 }
 #lose-text {
     color: rgb(255, 0, 0);
-    top: 50px;
+    top: 5rem;
     font-size: 2rem;
 }
 
