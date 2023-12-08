@@ -1,14 +1,14 @@
 import {defs, tiny} from './examples/common.js';
 import Ball from './Ball.js';
 import * as texteditor from './text-manager.js';
-import Defender from './Defender.js'
+import { Defender, Ball_Chaser, Speed_Bump } from './Defender.js'
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
 
 const ball_initial_position = vec4(0,15,0,1)
-const domeRadius = 100;
+const domeRadius = 300;
 
 const SoccerGoal = defs.SoccerGoal =
     class SoccerGoal extends Shape {
@@ -71,7 +71,7 @@ export class SoccerShootout extends Scene {
     constructor() {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
-        this.goalie_displayed = false;
+
         this.arrow_ang_x = 0
         this.arrow_ang_y = 0
         this.x_range = [-7, 7]
@@ -80,8 +80,10 @@ export class SoccerShootout extends Scene {
         this.level = 0
         this.lost = false;
         this.misses = 0;
-        this.level_obstacles = [{"goalies": 0, "defenders": 0}, {"goalies": 1, "defenders": 0}, {"goalies": 1, "defenders": 1}, {"goalies": 1, "defenders": 2}, {"goalies": 1, "defenders": 3}]
+        this.level_obstaces = [{"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 1}, {"goalies": 1, "defenders": 0, "ball_chasers": 1}, {"goalies": 1, "defenders": 1, "ball_chasers": 0}, {"goalies": 1, "defenders": 1, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 2}]
         this.defenders = []
+        this.ball_chasers = []
+        this.speed_bumps = []
         // For collision debugging
         this.wireframes = [
             new Wireframe([-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [-1, -1, 1]),
@@ -94,40 +96,40 @@ export class SoccerShootout extends Scene {
 
         // *** Materials
         this.materials = {
+            arrow_mat: new Material(new defs.Phong_Shader(),
+                {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("#FF0000")}),
+            ball_mat: new Material(new defs.Phong_Shader(),
+                {ambient: 0.7, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
+            ball_texture: new Material(new defs.Textured_Phong(),
+                {ambient: 1, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/soccerball.png", "NEAREST")}),
+            dome_mat: new Material(new defs.Textured_Phong(),
+                {ambient: 1, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/sky12.jpg", "NEAREST")}),
+            face_texture: new Material(new defs.Textured_Phong(),
+                {color: hex_color("#000000"), ambient: 0.9, diffusivity: 0.6, specularity: 0.1,
+                texture: new Texture("assets/angry2.png", "NEAREST")}),
             grass_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.4, diffusivity: 0.8, specularity: 0, color: hex_color("#7CFC00")}),
             grass_texture: new Material(new defs.Textured_Phong(),
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
-                texture: new Texture("assets/grass4.png", "NEAREST")}),
-            ball_mat: new Material(new defs.Phong_Shader(),
-                {ambient: 0.7, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
-            ball_texture: new Material(new defs.Textured_Phong(),
-                {ambient: 1, diffusivity: 0.1, specularity: 0.1, transparency_factor: .2,
-                texture: new Texture("assets/soccerball.png", "NEAREST")}),
-            
-            face_texture: new Material(new defs.Textured_Phong(),
-                {color: hex_color("#000000"), ambient: 0.9, diffusivity: 0.6, specularity: 0.1,
-                texture: new Texture("assets/angry2.png", "NEAREST")}),
-
+                texture: new Texture("assets/grass.jpg", "LINEAR_MIPMAP_LINEAR")}),
             goalie_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("FCFCFC")}),
-            arrow_mat: new Material(new defs.Phong_Shader(),
-                {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("#FF0000")}),
             net_texture: new Material(new defs.Textured_Phong(),
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/net.png", "NEAREST")}),
-            post_color: new Material(new defs.Phong_Shader(),
-            {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
-            transparent: new Material(new defs.Phong_Shader(),
-            {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF"), }),
-            power_mat: new Material(new defs.Phong_Shader(),
-            {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
             obstacle: new Material(new defs.Phong_Shader(),
                 {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("#0000FF")}),
+            post_color: new Material(new defs.Phong_Shader(),
+                {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
+            power_mat: new Material(new defs.Phong_Shader(),
+                {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
+            speed_bump_mat: new Material(new defs.Phong_Shader(),
+                {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("FCFCFC")}),
+            transparent: new Material(new defs.Phong_Shader(),
+                {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF"), }),
             wireframe: new Material(new defs.Basic_Shader()),
-            dome_mat : new Material(new defs.Textured_Phong(),
-                {ambient: 1, diffusivity: 0.1, specularity: 0.1,
-                texture: new Texture("assets/sky12.jpg", "NEAREST")}),
         }       
 
         // At the beginning of our program, load one of each of these shape definitions onto the GPU.
@@ -141,10 +143,9 @@ export class SoccerShootout extends Scene {
             rectangle: new defs.Square(),
             obstacle: new defs.Cube(),
             circle: new defs.Regular_2D_Polygon(30,30),
-            // ball_shadow: new defs.Regular_2D_Polygon(30, 30),
         };
 
-        this.shapes.grass.arrays.texture_coord = this.shapes.grass.arrays.texture_coord.map(x => x.times(4));
+        this.shapes.grass.arrays.texture_coord = this.shapes.grass.arrays.texture_coord.map(x => x.times(25));
 
         this.power = 0;
         this.ball = new Ball(ball_initial_position)
@@ -179,12 +180,21 @@ export class SoccerShootout extends Scene {
     reset() {
         this.ball.reset(ball_initial_position)
         this.already_kicked = false
-        this.lost = false;
         this.goalie_pos = [0, -3.5, -38]
         this.defenders = []
-        for (let index = 0; index < this.level_obstacles[this.level]["defenders"]; index++){
+        this.ball_chasers = []
+        this.speed_bumps = []
+        for (let index = 0; index < this.level_obstaces[this.level]["defenders"]; index++){
             let defender = new Defender(this.x_range, this.y_range)
             this.defenders.push(defender)
+        }
+        for (let index = 0; index < this.level_obstaces[this.level]["ball_chasers"]; index++){
+            let ball_chaser = new Ball_Chaser(this.x_range, this.y_range)
+            this.ball_chasers.push(ball_chaser)
+        }
+        for (let index = 0; index < this.level_obstaces[this.level]["speed_bumps"]; index++){
+            let speed_bump = new Speed_Bump(this.x_range, this.y_range)
+            this.speed_bumps.push(speed_bump)
         }
         this.scored_this_possession = null;
         this.missed_this_possession = null; 
@@ -200,6 +210,8 @@ export class SoccerShootout extends Scene {
             
             program_state.set_camera(this.initial_camera_location);
         }
+
+        
         
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, .1, 1000);
@@ -215,7 +227,7 @@ export class SoccerShootout extends Scene {
         program_state.lights = [new Light(light_position, hex_color("#fdfbd3"), 10000)];
         
         //Draw grass floor
-        let grass_tr = Mat4.translation(0,-51.4,0).times(Mat4.scale(100,50,100).times(Mat4.identity()))
+        let grass_tr = Mat4.translation(0,-51.4,0).times(Mat4.scale(domeRadius,50,domeRadius).times(Mat4.identity()))
         this.shapes.grass.draw(context, program_state, grass_tr, this.materials.grass_texture)
 
         //Draw aiming arrow
@@ -233,7 +245,7 @@ export class SoccerShootout extends Scene {
         }
         this.power = r;
 
-        // Draw power meter circle
+        //Draw power meter circle
         let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
         power_tr = Mat4.translation(0, -0.9, 0).times(Mat4.rotation(Math.PI/2,1,0,0)).times(power_tr);
         const r_n = r/2; 
@@ -241,81 +253,7 @@ export class SoccerShootout extends Scene {
         const green = 1-r_n;
         const blue = 0;
         let power_color = color(red, blue, green, 1);
-        //         // Draw power meter circle
-        //         let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
-        //         power_tr = Mat4.translation(0, -0.9, 0).times(Mat4.rotation(Math.PI/2,1,0,0)).times(power_tr);
-        //         const r_n = r/2; 
-        //         const red = r_n;
-        //         const green = 1-r_n;
-        //         const blue = 0;
-        //         let power_color = color(red, blue, green, 1);
         this.shapes.circle.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
-
-        // Draw circle shadow for ball
-        const ball_radius = 1/* Set the actual radius of the ball here */;
-        const shadow_radius = ball_radius + this.ball.position[1] * 0.06/* Set a scaling factor here */;
-        const transparency_factor = .1/* Set a factor for transparency here */;
-        let shadow_tr = Mat4.scale(shadow_radius, shadow_radius, shadow_radius).times(Mat4.identity());
-        shadow_tr = Mat4.translation(this.ball.position[0], -0.9, this.ball.position[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(shadow_tr);
-        const alpha = 1 - transparency_factor * shadow_radius; // Calculate alpha based on the scaling factor
-        const shadow_color = color(0, 0, 0, alpha); // Set power circle color to black with adjusted transparency
-        this.shapes.circle.draw(context, program_state, shadow_tr, this.materials.power_mat.override(shadow_color));
-
-        // Draw shadow circle for goalie if goalie is displayed
-        if (this.level_obstacles[this.level]["goalies"] === 1) {
-            const goalie_shadow_radius = 2/* Set the shadow radius for the goalie */;
-            let goalie_shadow_tr = Mat4.scale(goalie_shadow_radius, goalie_shadow_radius, goalie_shadow_radius).times(Mat4.identity());
-            goalie_shadow_tr = Mat4.translation(this.goalie_pos[0], -0.9, this.goalie_pos[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(goalie_shadow_tr);
-
-            const goalie_shadow_alpha = 0.75/* Set the transparency factor for the goalie shadow */;
-            const goalie_shadow_color = color(0, 0, 0, goalie_shadow_alpha);
-
-            this.shapes.circle.draw(context, program_state, goalie_shadow_tr, this.materials.power_mat.override(goalie_shadow_color));
-        }
-
-        // Draw shadow circles for defenders if defenders are displayed
-        // if (this.defenders.length!=0) {
-        //     for (let index = 0; index < this.defenders.length; index++) {
-        //         const defender_shadow_radius = 2/* Set the shadow radius for defenders */;
-        //         let defender_shadow_tr = Mat4.scale(defender_shadow_radius, defender_shadow_radius, defender_shadow_radius).times(Mat4.identity());
-        //         // defender_shadow_tr = this.defenders[index].get_tr().times(Mat4.translation(0, -0.9, 0)).times(defender_shadow_tr);
-        //         defender_shadow_tr = Mat4.translation(this.defenders[index].position[0],-0.9, this.defenders[index].position[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(defender_shadow_tr);
-
-        //         const defender_shadow_alpha = 0.75/* Set the transparency factor for defenders' shadows */;
-        //         const defender_shadow_color = color(0, 0, 0, defender_shadow_alpha);
-
-        //         this.shapes.circle.draw(context, program_state, defender_shadow_tr, this.materials.power_mat.override(defender_shadow_color));
-        //     }
-        // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-let sphere_tr = Mat4.scale(5, 5, 5).times(Mat4.identity());
-    sphere_tr = Mat4.translation(0, 40, -90).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(sphere_tr);
-    sphere_tr = Mat4.translation(0, 0, 2 * r).times(sphere_tr); // Adjust the height above the power circle
-    this.shapes.ball.draw(context, program_state, sphere_tr, this.materials.power_mat.override(hex_color("#FFFFFF")));
-
-
-
-
-
-
-
-
-
-
-
         
         
         // Transform Goal:
@@ -343,11 +281,11 @@ let sphere_tr = Mat4.scale(5, 5, 5).times(Mat4.identity());
         let goalie_tr = Mat4.identity()
 
         //Draw Goalie
-        if (this.level_obstacles[this.level]["goalies"] == 1){
+        if (this.level_obstaces[this.level]["goalies"] == 1){
             goalie_tr = Mat4.translation(this.goalie_pos[0], this.goalie_pos[1], this.goalie_pos[2]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
             this.goalie_tr = goalie_tr;
              //initialize the location of goalie's body
-            let head = goalie_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
+             let head = goalie_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
             let body = goalie_tr.times(Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)).times(Mat4.identity()));
             let left_hand = goalie_tr.times(Mat4.translation(-1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
             let right_hand = goalie_tr.times(Mat4.translation(1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
@@ -362,8 +300,20 @@ let sphere_tr = Mat4.scale(5, 5, 5).times(Mat4.identity());
         
         for (let index = 0; index < this.defenders.length; index++){
             this.defenders[index].move(dt)
-            this.defenders[index].draw(context, program_state)
+            this.defenders[index].draw(context, program_state, this.materials)
         }
+
+        for (let index = 0; index < this.speed_bumps.length; index++){
+            this.speed_bumps[index].draw(context, program_state, this.materials)
+        }
+
+        for (let index = 0; index < this.ball_chasers.length; index++){
+            if (this.already_kicked){
+                this.ball_chasers[index].move(dt, this.ball.position)
+            }
+            this.ball_chasers[index].draw(context, program_state, this.materials)
+        }
+
         
         // Draw a blue dome around the field
         let bt = Mat4.scale(domeRadius,domeRadius,domeRadius).times(Mat4.identity())
@@ -381,8 +331,8 @@ let sphere_tr = Mat4.scale(5, 5, 5).times(Mat4.identity());
             0.8, 0.8, 0.8,
             0.3, 0.3, 0.3, 0.3,
         ];
-        // console.log(this.level, this.level_obstacles[this.level], this.defenders)
-        if (this.level_obstacles[this.level]["goalies"] == 1){
+        // console.log(this.level, this.level_obstaces[this.level], this.defenders)
+        if (this.level_obstaces[this.level]["goalies"] == 1){
             goalie_tr = Mat4.translation(0,3.5,0).times(goalie_tr).times(Mat4.scale(1,1,4))
             collidable_obstacles.push(goalie_tr)
             restitution_coefs.push(0.8)
@@ -391,10 +341,20 @@ let sphere_tr = Mat4.scale(5, 5, 5).times(Mat4.identity());
             collidable_obstacles.push(this.defenders[index].get_tr())
             restitution_coefs.push(0.8)
         }
+        for (let index = 0; index < this.ball_chasers.length; index++){
+            collidable_obstacles.push(this.ball_chasers[index].get_tr())
+            restitution_coefs.push(0.8)
+        }
+        for (let index = 0; index < this.speed_bumps.length; index++){
+            collidable_obstacles.push(this.speed_bumps[index].get_tr())
+            restitution_coefs.push(0.8)
+        }
 
-        const { i, tr } = this.ball.update(dt, collidable_obstacles, restitution_coefs);
-        if (i != null) {
-            this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
+        for(let j = 0; j < 15; j++){
+            const { i, tr } = this.ball.update(dt/15, collidable_obstacles, restitution_coefs);
+            if (i != null) {
+                this.wireframes[i].draw(context, program_state, tr, this.materials.wireframe, "LINES");
+            }
         }
 
         if(this.ball.goal){
@@ -406,21 +366,21 @@ let sphere_tr = Mat4.scale(5, 5, 5).times(Mat4.identity());
             }
             if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
                 this.level += 1
-                this.level = this.level % 5
+                this.level = this.level % this.level_obstaces.length
                 this.reset();
             }
         }   
         if(!this.ball.goal){
             if (this.missed_this_possession == null && this.already_kicked == true) {
-                this.misses += 1;
                 this.missed_this_possession = t;
             }
             if (this.missed_this_possession != null && t - this.missed_this_possession > 3) {
-                if(this.misses >3){
+                this.misses += 1;
+                if(this.misses > 3){
                     this.lost = true;
-                    this.level = 2;
+                    this.level = 0;
                     this.misses = 0;
-                    //youLose(this.lost);
+                    //texteditor.youLose(this.lost);
                 }
                 this.reset();
             }
@@ -449,11 +409,10 @@ let sphere_tr = Mat4.scale(5, 5, 5).times(Mat4.identity());
         //Draw ball
         this.shapes.ball.draw(context, program_state, this.ball.transform, this.materials.ball_texture)
 
-        // Update text
         texteditor.updateGoalText(this.ball.goal);
         texteditor.updateMisses(this.misses);
         texteditor.updateLevels(this.level)
-        //youLose(this.lost);
+        texteditor.youLose(this.lost);
         texteditor.updateScore(this.level);
     }
 
