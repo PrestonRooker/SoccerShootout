@@ -263,7 +263,9 @@ export class SoccerShootout extends Scene {
                 shadow_tr = Mat4.translation(this.ball.position[0], -0.9, this.ball.position[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(shadow_tr);
                 const alpha = 1 - transparency_factor * shadow_radius; // Calculate alpha based on the scaling factor
                 const shadow_color = color(0, 0, 0, alpha); // Set power circle color to black with adjusted transparency
-                this.shapes.circle.draw(context, program_state, shadow_tr, this.materials.power_mat.override(shadow_color));
+                if(this.already_kicked){
+                    this.shapes.circle.draw(context, program_state, shadow_tr, this.materials.power_mat.override(shadow_color));
+                }
 
         
         // Transform Goal:
