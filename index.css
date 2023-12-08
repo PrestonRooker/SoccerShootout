@@ -55,6 +55,12 @@ html, body {
     top: 5rem;
     font-size: 2rem;
 }
+#title-text {
+    color: rgb(254, 243, 243);
+    top: 75%;
+    left: 35%;
+    font-size: 1.5rem;
+}
 
 @font-face {
     font-family: Poppins;
