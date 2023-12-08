@@ -231,8 +231,7 @@ export class SoccerShootout extends Scene {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
 
-        
-
+    
         if (!context.scratchpad.controls) {
             context.scratchpad.controls = new defs.Movement_Controls();
             // this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
