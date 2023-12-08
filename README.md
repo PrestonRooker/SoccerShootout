@@ -1,15 +1,17 @@
 # Soccer Shootout
 
 Soccer Shootout is a 3D game where players must shoot penalty kicks against
-ever-increasing odds. It is our final project for UCLA's CS 174A class.
+ever-increasing odds. It is our final project for UCLA's CS 174A class. Check
+out the game on [our webpage](https://prestonrooker.github.io/SoccerShootout)!
 
 ![Soccer ball in a field, where 3 defenders guard a goal](docs/soccer-shootout.png)
 
 ## How to play
 
-Aim the ball and shoot when you're ready. Aim for the goal around the defenders
-and obstacles. Score a goal in each level and you win! Miss more than 3 times in
-a level and it's game over.
+Aim the ball and shoot when you're ready. Watch for the power circle - a bigger
+circle means your shot will have more speed. Aim for the goal around the
+defenders and obstacles. Score goals to rack up points! Miss more than 3 times
+in a level and it's game over.
 
 ### Controls
 
@@ -36,6 +38,7 @@ cd SoccerShootout
   - Dynamics
   - Friction
   - Collision detection and resolution
+- Shadowing
 
 ## Attributions
 
