@@ -72,6 +72,12 @@ export class SoccerShootout extends Scene {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
 
+        this.background_music = new Audio('assets/backgroundmusic(chosic.com).mp3');
+        this.background_music.volume = 0.4;
+        this.background_music.loop = true;
+        this.has_music_started_playing = false;
+        this.mute = false;
+
         this.dimensions = [0, 0];
         this.arrow_ang_x = 0
         this.arrow_ang_y = 0
@@ -168,7 +174,12 @@ export class SoccerShootout extends Scene {
                 this.ball.velocity[0] += dir_vec[0];
                 this.ball.velocity[1] += dir_vec[1];
                 this.ball.velocity[2] += dir_vec[2];
-                this.already_kicked = true
+                this.already_kicked = true;
+            }
+            if(!this.has_music_started_playing){
+                this.has_music_started_playing = true;
+                this.background_music.play();
+                this.background_music.autoplay = true;
             }
         });
         // this.new_line();
