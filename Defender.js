@@ -21,10 +21,6 @@ class Defender {
             ball: new defs.Subdivision_Sphere(4),
             cylinder: new defs.Capped_Cylinder(30, 30),
         }
-        this.materials = {
-            power_mat: new Material(new defs.Phong_Shader(),
-            {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")})
-        }
     }
 
     // materials should contain "face_texture" and "ball_mat"
