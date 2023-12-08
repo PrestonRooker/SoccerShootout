@@ -115,6 +115,7 @@ export class SoccerShootoutShadows extends Scene {
             net: new defs.OpenCube(),
             goal: new defs.SoccerGoal(),
             cylinder: new defs.Capped_Cylinder(30, 30),
+            rectangle: new defs.Square(),
         };
 
         this.materials = {
@@ -392,6 +393,83 @@ export class SoccerShootoutShadows extends Scene {
         const panel_width = 80 / 5; // Same as the crossbar length
         const panel_height = 6; // Same as the post height
 
+        //Draw Field Lines:
+        // this.rectangle_length = 0.1; // Initial length
+        // let rectangle_tr = Mat4.translation(0, -1.4, -39).times(Mat4.scale(70, 0.1, this.rectangle_length)); // Adjust the scale as needed
+        // this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.power_mat);
+        
+        // rectangle_tr = Mat4.translation(0, -1.4, 10).times(Mat4.scale(40, 0.1, this.rectangle_length));
+        // this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.power_mat);
+
+        let rectangle_tr = Mat4.translation(0, -1.4, -23).times(Mat4.scale(18, 0.1, this.rectangle_length));
+        this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.power_mat);
+
+        const width = 0.4;
+        const inner_length = 8;
+        const mid_length = 24.5;
+        const outer_length = 60;
+        const rotation_angle = Math.PI / 2;
+
+        //Draw Horizontal Lines
+        const translation_vectorH1 = vec3(0, -1.3, -39); 
+        const rectangle_transformH1 = Mat4.translation(...translation_vectorH1)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.rotation(rotation_angle, 0, 0, 1))
+            .times(Mat4.scale(0.5, 70, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformH1, this.materials.power_mat);
+
+        const translation_vectorH2 = vec3(0, -1.3, 10); 
+        const rectangle_transformH2 = Mat4.translation(...translation_vectorH2)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))  // Rotate about the x-axis
+            .times(Mat4.rotation(rotation_angle, 0, 0, 1))  // Rotate about the z-axis
+            .times(Mat4.scale(0.5, 40, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformH2, this.materials.power_mat);
+        
+        const translation_vectorH3 = vec3(0, -1.3, -23); 
+        const rectangle_transformH3 = Mat4.translation(...translation_vectorH3)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.rotation(rotation_angle, 0, 0, 1))
+            .times(Mat4.scale(0.5, 18, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformH3, this.materials.power_mat);
+
+        //Draw inner bounds
+        const translation_vectorIL = vec3(-18, -1.35, -31); 
+        const rectangle_transformIL = Mat4.translation(...translation_vectorIL)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, inner_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformIL, this.materials.power_mat);
+
+        const translation_vectorIR = vec3(18, -1.35, -31); 
+        const rectangle_transformIR = Mat4.translation(...translation_vectorIR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, inner_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformIR, this.materials.power_mat);
+
+        //Draw mid bounds
+        const translation_vectorMR = vec3(40, -1.35, -14.5); 
+        const rectangle_transformMR = Mat4.translation(...translation_vectorMR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, mid_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformMR, this.materials.power_mat);
+
+        const translation_vectorML = vec3(-40, -1.35, -14.5); 
+        const rectangle_transformML = Mat4.translation(...translation_vectorML)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, mid_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformML, this.materials.power_mat);
+
+        //Draw outer bounds
+        const translation_vectorOR = vec3(70, -1.35, 21); 
+        const rectangle_transformOR = Mat4.translation(...translation_vectorOR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, outer_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformOR, this.materials.power_mat);
+
+        const translation_vectorOL = vec3(-70, -1.35, 21); 
+        const rectangle_transformOL = Mat4.translation(...translation_vectorOL)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, outer_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformOL, this.materials.power_mat);
 
         // Create and position the back panel
         const panel_scale = Mat4.scale(panel_width / 2, 5, panel_height / 2);
