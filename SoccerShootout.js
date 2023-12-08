@@ -117,6 +117,9 @@ export class SoccerShootout extends Scene {
             face_texture: new Material(new defs.Textured_Phong(),
                 {color: hex_color("#000000"), ambient: 0.9, diffusivity: 0.6, specularity: 0.1,
                 texture: new Texture("assets/angry2.png", "NEAREST")}),
+            face_texture2: new Material(new defs.Textured_Phong(),
+                {color: hex_color("#000000"), ambient: 0.9, diffusivity: 0.6, specularity: 0.1,
+                texture: new Texture("assets/angry3.png", "NEAREST")}),
             grass_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.4, diffusivity: 0.8, specularity: 0, color: hex_color("#7CFC00")}),
             grass_texture: new Material(new defs.Textured_Phong(),
@@ -195,6 +198,9 @@ export class SoccerShootout extends Scene {
     }
 
     reset() {
+        this.materials.face_texture = new Material(new defs.Textured_Phong(),
+        {color: hex_color("#000000"), ambient: 0.9, diffusivity: 0.6, specularity: 0.1,
+        texture: new Texture("assets/angry2.png", "NEAREST")});
         this.ball.reset(ball_initial_position)
         this.already_kicked = false
         this.goalie_pos = [0, -3.5, -38]
@@ -385,12 +391,15 @@ export class SoccerShootout extends Scene {
             goalie_tr = Mat4.translation(this.goalie_pos[0], this.goalie_pos[1], this.goalie_pos[2]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
             this.goalie_tr = goalie_tr;
              //initialize the location of goalie's body
-             let head = goalie_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
+            let head = goalie_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
             let body = goalie_tr.times(Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)).times(Mat4.identity()));
             let left_hand = goalie_tr.times(Mat4.translation(-1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
             let right_hand = goalie_tr.times(Mat4.translation(1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
 
             //draw the goalie
+            if(this.ball.goal){
+            this.shapes.ball.draw(context, program_state, head, this.materials.face_texture2);
+            }
             this.shapes.ball.draw(context, program_state, head, this.materials.face_texture);
             this.shapes.ball.draw(context, program_state, left_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
             this.shapes.ball.draw(context, program_state, right_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
@@ -413,7 +422,11 @@ export class SoccerShootout extends Scene {
         //Draw Defenders
         for (let index = 0; index < this.defenders.length; index++){
             this.defenders[index].move(dt)
-            this.defenders[index].draw(context, program_state, this.shapes, this.materials)
+            if (this.ball.goal&&this.already_kicked){
+                this.materials.face_texture = this.materials.face_texture2;
+            }
+            // Draw the defender
+            this.defenders[index].draw(context, program_state, this.shapes, this.materials);
 
             //draw defenders shadow
             let defender_shadow_tr = Mat4.scale(2,2,2).times(Mat4.identity());
@@ -431,6 +444,9 @@ export class SoccerShootout extends Scene {
         for (let index = 0; index < this.ball_chasers.length; index++){
             if (this.already_kicked){
                 this.ball_chasers[index].move(dt, this.ball.position)
+            }
+            if (this.ball.goal&&this.already_kicked){
+                this.materials.face_texture = this.materials.face_texture2;
             }
             this.ball_chasers[index].draw(context, program_state, this.shapes, this.materials)
             //draw chasers shadow
@@ -489,6 +505,7 @@ export class SoccerShootout extends Scene {
                 this.misses = 0;
                 this.lost = false;
                 this.scored_this_possession = t;
+                // this.materials.face_texture = this.materials.face_texture2;
             }
             if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
                 this.level += 1
