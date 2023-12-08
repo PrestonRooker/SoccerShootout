@@ -284,19 +284,88 @@ export class SoccerShootout extends Scene {
         let power_color = color(red, blue, green, 1);
         this.shapes.circle.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
         
-                // Draw circle shadow for ball
-                const ball_radius = 1/* Set the actual radius of the ball here */;
-                const shadow_radius = ball_radius + this.ball.position[1] * 0.06/* Set a scaling factor here */;
-                const transparency_factor = .1/* Set a factor for transparency here */;
-                let shadow_tr = Mat4.scale(shadow_radius, shadow_radius, shadow_radius).times(Mat4.identity());
-                shadow_tr = Mat4.translation(this.ball.position[0], -0.9, this.ball.position[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(shadow_tr);
-                const alpha = 1 - transparency_factor * shadow_radius; // Calculate alpha based on the scaling factor
-                const shadow_color = color(0, 0, 0, alpha); // Set power circle color to black with adjusted transparency
-                if(this.already_kicked){
-                    this.shapes.circle.draw(context, program_state, shadow_tr, this.materials.power_mat.override(shadow_color));
-                }
+        // Draw circle shadow for ball
+        const ball_radius = 1/* Set the actual radius of the ball here */;
+        const shadow_radius = ball_radius + this.ball.position[1] * 0.06/* Set a scaling factor here */;
+        const transparency_factor = .1/* Set a factor for transparency here */;
+        let shadow_tr = Mat4.scale(shadow_radius, shadow_radius, shadow_radius).times(Mat4.identity());
+        shadow_tr = Mat4.translation(this.ball.position[0], -0.9, this.ball.position[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(shadow_tr);
+        const alpha = 0.9 - transparency_factor * shadow_radius; // Calculate alpha based on the scaling factor
+        const shadow_color = color(0, 0, 0, alpha); // Set power circle color to black with adjusted transparency
+        if(this.already_kicked){
+            this.shapes.circle.draw(context, program_state, shadow_tr, this.materials.power_mat.override(shadow_color));
+        }
 
+
+        // Assuming the original camera and projection transforms
+// ...
+
+// // Set up the model-view matrix for the sphere at the origin
+// const sphere_transform = Mat4.translation(0, 0, 0).times(Mat4.scale(1, 1, 1)); // You can adjust the scale as needed
+
+// // Draw the sphere
+// this.shapes.ball.draw(context, program_state, sphere_transform, this.materials.ball_mat);
+
+
+        //Draw the Field Lines:
+        this.rectangle_length = 0.1; // Initial length
+        let rectangle_tr = Mat4.translation(0, -1.4, -39).times(Mat4.scale(70, 0.1, this.rectangle_length)); // Adjust the scale as needed
+        this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.ball_mat);
         
+        rectangle_tr = Mat4.translation(0, -1.4, 10).times(Mat4.scale(40, 0.1, this.rectangle_length));
+        this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.ball_mat);
+
+        rectangle_tr = Mat4.translation(0, -1.4, -23).times(Mat4.scale(18, 0.1, this.rectangle_length));
+        this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.ball_mat);
+
+        const width = 0.1;
+        const inner_length = 8;
+        const mid_length = 24.5;
+        const outer_length = 60;
+        const rotation_angle = Math.PI / 2;
+
+        //Draw inner bounds
+        const translation_vectorIL = vec3(-18, -1.3, -31);  // Adjust as needed
+        const rectangle_transformIL = Mat4.translation(...translation_vectorIL)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, inner_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformIL, this.materials.ball_mat);
+
+        const translation_vectorIR = vec3(18, -1.3, -31);  // Adjust as needed
+        const rectangle_transformIR = Mat4.translation(...translation_vectorIR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, inner_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformIR, this.materials.ball_mat);
+
+        //Draw mid bounds
+        const translation_vectorMR = vec3(40, -1.3, -14.5);  // Adjust as needed
+        const rectangle_transformMR = Mat4.translation(...translation_vectorMR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, mid_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformMR, this.materials.ball_mat);
+
+        const translation_vectorML = vec3(-40, -1.3, -14.5);  // Adjust as needed
+        const rectangle_transformML = Mat4.translation(...translation_vectorML)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, mid_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformML, this.materials.ball_mat);
+
+        //Draw outer bounds
+        const translation_vectorOR = vec3(70, -1.3, 21);  // Adjust as needed
+        const rectangle_transformOR = Mat4.translation(...translation_vectorOR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, outer_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformOR, this.materials.ball_mat);
+
+        const translation_vectorOL = vec3(-70, -1.3, 21);  // Adjust as needed
+        const rectangle_transformOL = Mat4.translation(...translation_vectorOL)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, outer_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformOL, this.materials.ball_mat);
+
+
+
+
         // Transform Goal:
         const upright_tilt = Mat4.rotation(Math.PI / 2,1,0,0)
         let goal_translation = Mat4.translation(0,20,-40).times(upright_tilt)
