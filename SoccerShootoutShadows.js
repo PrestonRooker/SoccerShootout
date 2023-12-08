@@ -97,6 +97,8 @@ export class SoccerShootoutShadows extends Scene {
         this.ball_chasers = []
         this.speed_bumps = []
         this.title = true;
+        // document.body.classList.add('blurred');
+
         // For collision debugging
         this.wireframes = [
             new Wireframe([-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [-1, -1, 1]),
@@ -215,6 +217,7 @@ export class SoccerShootoutShadows extends Scene {
         this.key_triggered_button("Kick", ["Enter"], () => {
             if(this.title){
                 this.title = false;
+                document.body.classList.remove('blurred');
             }
             if(!this.already_kicked){
                 let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(50*this.power);

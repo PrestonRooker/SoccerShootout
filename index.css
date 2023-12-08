@@ -6,6 +6,15 @@ html, body {
 }
 .blurred{
     filter: blur(5px);
+    transition: filter 1s;
+}
+.canvas-widget {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 2; 
 }
 
 #main-canvas {
@@ -62,14 +71,11 @@ html, body {
 }
 
 img{
-    width: 45px; /* Adjust the width as needed */
-    height: 45px; /* Adjust the height as needed */
-    max-width: 100%; /* Ensure the image doesn't exceed its natural size */
-    margin-right: 20px; /* Optional margin between hearts */
-    display: inline-block; /* Ensure hearts are displayed in a line */
-    /* filter: brightness(100%); Optional: Adjust brightness for a subtle effect */
-    background-color: #ff0000; /* Adjust the color as needed */
-    border-radius: 50%; /* Optional: Make the background a circle */
+    width: 45px;
+    height: 45px;
+    max-width: 100%;
+    margin-right: 20px; 
+    display: inline-block; 
 }
 
 #point-container {
@@ -110,7 +116,7 @@ img{
     text-shadow: 0 0 10px rgba(255, 0, 0), 0 0 10px rgba(255, 0, 0), 0 0 10px rgba(255, 0, 0), 0 0 10px rgba(255, 0, 0);
 }
 #title-text {
-    color: rgb(254, 243, 243);
+    color: rgb(255, 255, 255);
     bottom: 1rem;
     left: 1rem;
     font-size: 1.5rem;
@@ -118,6 +124,7 @@ img{
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     letter-spacing: 1px;
 }
+
 
 @font-face {
     font-family: Poppins;

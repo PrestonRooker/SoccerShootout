@@ -62,3 +62,11 @@ export function displayTitleScreen(show){
     const titleElement = document.getElementById('title-text');
     titleElement.style.visibility = show ? "visible" : "hidden";
 }
+
+export function addBlur() {
+    document.body.classList.add("blurred");
+}
+
+export function removeBlur() {
+    document.body.classList.remove("blurred");
+}
