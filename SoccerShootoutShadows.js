@@ -583,7 +583,7 @@ export class SoccerShootoutShadows extends Scene {
             }
             if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
                 this.level += 1
-                this.level = this.level % this.level_obstaces.length
+                this.level = Math.min(this.level, this.level_obstaces.length - 1)
                 this.reset();
             }
         }   
