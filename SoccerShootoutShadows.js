@@ -158,7 +158,7 @@ export class SoccerShootoutShadows extends Scene {
                 light_depth_texture: null, 
             }),
             body_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: hex_color("#f25003"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 100,
+                color: hex_color("#8B0000"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 100,
                 light_depth_texture: null
             }),
             speed_bump_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
@@ -229,6 +229,10 @@ export class SoccerShootoutShadows extends Scene {
     }
 
     reset() {
+        this.materials.face_texture = new Material(new Shadow_Textured_Phong_Shader(1), {
+            color: hex_color("#f1c27d"), ambient: .45, diffusivity: 0.1, specularity: 0.2, smoothness: 64,
+            light_depth_texture: null,
+            color_texture: new Texture("assets/angry2.png", "LINEAR_MIPMAP_LINEAR")});
         this.ball.reset(ball_initial_position)
         this.already_kicked = false
         this.goalie_pos = [0, -3.5, -38]
@@ -505,16 +509,16 @@ export class SoccerShootoutShadows extends Scene {
                 this.shapes.ball.draw(context, program_state, head, shadow_pass? this.materials.face_texture2 : this.pure);
             }
             this.shapes.ball.draw(context, program_state, head, shadow_pass? this.materials.face_texture : this.pure);
-            this.shapes.ball.draw(context, program_state, left_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color("#f1c27d")}) : this.pure);
-            this.shapes.ball.draw(context, program_state, right_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color("#f1c27d")}) : this.pure);
-            this.shapes.cylinder.draw(context, program_state, body, shadow_pass? this.materials.body_mat : this.pure);
+            this.shapes.ball.draw(context, program_state, left_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color("#353631")}) : this.pure);
+            this.shapes.ball.draw(context, program_state, right_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color("#353631")}) : this.pure);
+            this.shapes.cylinder.draw(context, program_state, body, shadow_pass? this.materials.body_mat.override({color:hex_color("#FDDA0D")}) : this.pure);
             this.moveGoalie(dt)
 
         }
         //Draw Defenders
         for (let index = 0; index < this.defenders.length; index++){
             this.defenders[index].move(dt)
-            if (this.ball.goal&&this.already_kicked){
+            if (this.ball.goal){
                 this.materials.face_texture = this.materials.face_texture2;
             }
             this.defenders[index].draw(context, program_state, this.shapes, this.materials, shadow_pass)
@@ -528,7 +532,7 @@ export class SoccerShootoutShadows extends Scene {
             if (this.already_kicked){
                 this.ball_chasers[index].move(dt, this.ball.position)
             }
-            if (this.ball.goal&&this.already_kicked){
+            if (this.ball.goal){
                 this.materials.face_texture = this.materials.face_texture2;
             }
             this.ball_chasers[index].draw(context, program_state, this.shapes, this.materials, shadow_pass)
