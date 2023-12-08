@@ -20,7 +20,7 @@ class Defender {
 
     // shapes should contain "ball" and "cylinder"
     // materials should contain "face_texture" and "ball_mat"
-    draw(context, program_state, shapes, materials) {
+    draw(context, program_state, shapes, materials, shadow_pass) {
         this.defender_tr = Mat4.translation(this.x_pos, -3.5, this.y_pos).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0))
         // console.log("Drawing", this.defender_tr)
         let d_head = this.defender_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
@@ -29,10 +29,10 @@ class Defender {
         let d_right_hand = this.defender_tr.times(Mat4.translation(1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
 
         //draw defender 
-        shapes.ball.draw(context, program_state, d_head, materials.face_texture);
-        shapes.ball.draw(context, program_state, d_left_hand, materials.ball_mat.override(hex_color("#f1c27d")));
-        shapes.ball.draw(context, program_state, d_right_hand, materials.ball_mat.override(hex_color("#f1c27d")));
-        shapes.cylinder.draw(context, program_state, d_body, materials.ball_mat.override(hex_color("#00ffff")));
+        shapes.ball.draw(context, program_state, d_head, shadow_pass? materials.face_texture : materials.pure);
+        shapes.ball.draw(context, program_state, d_left_hand, shadow_pass? materials.hands_mat : materials.pure);
+        shapes.ball.draw(context, program_state, d_right_hand, shadow_pass? materials.hands_mat : materials.pure);
+        shapes.cylinder.draw(context, program_state, d_body, shadow_pass? materials.body_mat : materials.pure);
         this.defender_tr = Mat4.translation(0,3.5,0).times(this.defender_tr).times(Mat4.scale(1,1,4))
 
         //draw shadow
@@ -48,7 +48,6 @@ class Defender {
 
 
     move(dt) {
-        dt = dt / 2
         if (this.move_right){
             this.movement_change += this.speed * dt 
         }
@@ -122,9 +121,9 @@ class Speed_Bump {
 
     // shapes should contain "cylinder"
     // materials should contain "speed_bump_mat"
-    draw(context, program_state, shapes, materials) {
+    draw(context, program_state, shapes, materials, shadow_pass) {
         this.bump_tr = Mat4.translation(this.x_pos, -0.75, this.y_pos).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0)).times(Mat4.scale(0.75,0.75,3))
-        shapes.cylinder.draw(context, program_state, this.bump_tr, materials.speed_bump_mat.override(hex_color("#f1c27d")));
+        shapes.cylinder.draw(context, program_state, this.bump_tr, shadow_pass ? materials.speed_bump_mat : materials.pure);
     }
 
     getRandomInt(min, max) {
