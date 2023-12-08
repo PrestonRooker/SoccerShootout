@@ -144,7 +144,7 @@ export class SoccerShootoutShadows extends Scene {
                 color_texture: new Texture("assets/angry2.png", "LINEAR_MIPMAP_LINEAR")
             }),
             face_texture2: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: color(.5, .5, .5, 1), ambient: .3, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: hex_color("#f1c27d"), ambient: .3, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
                 light_depth_texture: null,
                 color_texture: new Texture("assets/angry3.png", "LINEAR_MIPMAP_LINEAR")
             }),
@@ -154,15 +154,11 @@ export class SoccerShootoutShadows extends Scene {
                 color_texture:  hex_color("#FFFFFF")
             }),
             hands_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: hex_color("#a18a68"), ambient: .7, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: hex_color("#f1c27d"), ambient: .7, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
                 light_depth_texture: null, 
             }),
             body_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
-<<<<<<< HEAD
                 color: hex_color("#f25003"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 100,
-=======
-                color: hex_color("#8B0000"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 64,
->>>>>>> e207645d927a65529fdd7640d60862866ed6c211
                 light_depth_texture: null
             }),
             speed_bump_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
@@ -509,9 +505,9 @@ export class SoccerShootoutShadows extends Scene {
                 this.shapes.ball.draw(context, program_state, head, shadow_pass? this.materials.face_texture2 : this.pure);
             }
             this.shapes.ball.draw(context, program_state, head, shadow_pass? this.materials.face_texture : this.pure);
-            this.shapes.ball.draw(context, program_state, left_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color('#505050')}) : this.pure);
-            this.shapes.ball.draw(context, program_state, right_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color('#505050')}) : this.pure);
-            this.shapes.cylinder.draw(context, program_state, body, shadow_pass? this.materials.body_mat.override({color:hex_color("#DFFF00")}) : this.pure);
+            this.shapes.ball.draw(context, program_state, left_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color("#f1c27d")}) : this.pure);
+            this.shapes.ball.draw(context, program_state, right_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color("#f1c27d")}) : this.pure);
+            this.shapes.cylinder.draw(context, program_state, body, shadow_pass? this.materials.body_mat : this.pure);
             this.moveGoalie(dt)
 
         }
