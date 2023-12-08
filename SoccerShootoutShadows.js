@@ -91,7 +91,7 @@ export class SoccerShootoutShadows extends Scene {
         this.level = 0
         this.lost = false;
         this.misses = 0;
-        this.level_obstaces = [{"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 1, "defenders": 1, "ball_chasers": 1, "speed_bumps": 1}, {"goalies": 1, "defenders": 0, "ball_chasers": 1}, {"goalies": 1, "defenders": 1, "ball_chasers": 0}, {"goalies": 1, "defenders": 1, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 2}]
+        this.level_obstaces = [{"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 1, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 1, "defenders": 0, "ball_chasers": 0, "speed_bumps": 2}, {"goalies": 1, "defenders": 1, "ball_chasers": 0, "speed_bumps": 2}, {"goalies": 1, "defenders": 1, "ball_chasers": 1, "speed_bumps": 2}, {"goalies": 1, "defenders": 2, "ball_chasers": 1, "speed_bumps": 2}, {"goalies": 1, "defenders": 2, "ball_chasers": 2, "speed_bumps": 2}]
         this.defenders = []
         this.ball_chasers = []
         this.speed_bumps = []
@@ -422,16 +422,6 @@ export class SoccerShootoutShadows extends Scene {
             this.shapes.ball.draw(context, program_state, right_hand, shadow_pass? this.materials.hands_mat : this.pure);
             this.shapes.cylinder.draw(context, program_state, body, shadow_pass? this.materials.body_mat : this.pure);
             this.moveGoalie(dt)
-
-            // const goalie_shadow_radius = 2/* Set the shadow radius for the goalie */;
-            // let goalie_shadow_tr = Mat4.scale(goalie_shadow_radius, goalie_shadow_radius, goalie_shadow_radius).times(Mat4.identity());
-            // goalie_shadow_tr = Mat4.translation(this.goalie_pos[0], -0.9, this.goalie_pos[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(goalie_shadow_tr);
-
-            // const goalie_shadow_alpha = 0.75/* Set the transparency factor for the goalie shadow */;
-            // const goalie_shadow_color = color(0, 0, 0, goalie_shadow_alpha);
-
-            // this.shapes.circle.draw(context, program_state, goalie_shadow_tr, this.materials.power_mat.override(goalie_shadow_color));
-
 
         }
 
