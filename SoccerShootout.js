@@ -87,11 +87,14 @@ export class SoccerShootout extends Scene {
         this.level = 0
         this.lost = false;
         this.misses = 0;
-        this.level_obstaces = [{"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 1}, {"goalies": 1, "defenders": 0, "ball_chasers": 1}, {"goalies": 1, "defenders": 1, "ball_chasers": 0}, {"goalies": 1, "defenders": 1, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 2}]
+        this.points = 0;
+        this.level_obstacles = [{"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 1}, {"goalies": 1, "defenders": 0, "ball_chasers": 1}, {"goalies": 1, "defenders": 1, "ball_chasers": 0}, {"goalies": 1, "defenders": 1, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 2}]
         this.defenders = []
         this.ball_chasers = []
         this.speed_bumps = []
         this.title = true;
+        // document.body.classList.add('blurred');
+
         // For collision debugging
         this.wireframes = [
             new Wireframe([-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [-1, -1, 1]),
@@ -175,6 +178,7 @@ export class SoccerShootout extends Scene {
         this.key_triggered_button("Kick", ["Enter"], () => {
             if(this.title){
                 this.title = false;
+                document.body.classList.remove('blurred');
             }
             if(!this.already_kicked){
                 let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(50*this.power);
@@ -207,15 +211,15 @@ export class SoccerShootout extends Scene {
         this.defenders = []
         this.ball_chasers = []
         this.speed_bumps = []
-        for (let index = 0; index < this.level_obstaces[this.level]["defenders"]; index++){
+        for (let index = 0; index < this.level_obstacles[this.level]["defenders"]; index++){
             let defender = new Defender(this.x_range, this.y_range)
             this.defenders.push(defender)
         }
-        for (let index = 0; index < this.level_obstaces[this.level]["ball_chasers"]; index++){
+        for (let index = 0; index < this.level_obstacles[this.level]["ball_chasers"]; index++){
             let ball_chaser = new Ball_Chaser(this.x_range, this.y_range)
             this.ball_chasers.push(ball_chaser)
         }
-        for (let index = 0; index < this.level_obstaces[this.level]["speed_bumps"]; index++){
+        for (let index = 0; index < this.level_obstacles[this.level]["speed_bumps"]; index++){
             let speed_bump = new Speed_Bump(this.x_range, this.y_range)
             this.speed_bumps.push(speed_bump)
         }
@@ -387,7 +391,7 @@ export class SoccerShootout extends Scene {
         let goalie_tr = Mat4.identity()
 
         //Draw Goalie
-        if (this.level_obstaces[this.level]["goalies"] == 1){
+        if (this.level_obstacles[this.level]["goalies"] == 1){
             goalie_tr = Mat4.translation(this.goalie_pos[0], this.goalie_pos[1], this.goalie_pos[2]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
             this.goalie_tr = goalie_tr;
              //initialize the location of goalie's body
@@ -473,8 +477,8 @@ export class SoccerShootout extends Scene {
             0.8, 0.8, 0.8,
             0.3, 0.3, 0.3, 0.3,
         ];
-        // console.log(this.level, this.level_obstaces[this.level], this.defenders)
-        if (this.level_obstaces[this.level]["goalies"] == 1){
+        // console.log(this.level, this.level_obstacles[this.level], this.defenders)
+        if (this.level_obstacles[this.level]["goalies"] == 1){
             goalie_tr = Mat4.translation(0,3.5,0).times(goalie_tr).times(Mat4.scale(1,1,4))
             collidable_obstacles.push(goalie_tr)
             restitution_coefs.push(0.8)
@@ -501,15 +505,15 @@ export class SoccerShootout extends Scene {
 
         if(this.ball.goal){
             if (this.scored_this_possession == null) {
+                this.points+=Math.round((Math.max(1,this.level)*100)/Math.max(this.misses,1));
                 this.goals++;
                 this.misses = 0;
                 this.lost = false;
                 this.scored_this_possession = t;
-                // this.materials.face_texture = this.materials.face_texture2;
             }
             if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
                 this.level += 1
-                this.level = this.level % this.level_obstaces.length
+                this.level = this.level % this.level_obstacles.length
                 this.reset();
             }
         }   
@@ -519,11 +523,17 @@ export class SoccerShootout extends Scene {
             }
             if (this.missed_this_possession != null && t - this.missed_this_possession > 3) {
                 this.misses += 1;
+                // texteditor.updateLifeCounter(this.misses);
                 if(this.misses > 3){
                     this.lost = true;
                     this.level = 0;
                     this.misses = 0;
+                    this.points = 0;
                     //texteditor.youLose(this.lost);
+                    // document.getElementById('score-container').style.display = 'none';
+                    // document.getElementById('miss-container').style.display = 'none';
+                    // document.getElementById('point-container').style.display = 'none';
+                    // document.getElementById('level-container').style.display = 'none';
                 }
                 this.reset();
             }
@@ -556,7 +566,9 @@ export class SoccerShootout extends Scene {
         texteditor.updateMisses(this.misses);
         texteditor.updateLevels(this.level)
         texteditor.youLose(this.lost);
+        texteditor.updateLifeCounter(this.misses);
         texteditor.updateScore(this.level);
+        texteditor.updatePoints(this.points);
     }
 
 
