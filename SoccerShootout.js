@@ -87,14 +87,11 @@ export class SoccerShootout extends Scene {
         this.level = 0
         this.lost = false;
         this.misses = 0;
-        this.points = 0;
-        this.level_obstacles = [{"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 1}, {"goalies": 1, "defenders": 0, "ball_chasers": 1}, {"goalies": 1, "defenders": 1, "ball_chasers": 0}, {"goalies": 1, "defenders": 1, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 2}]
+        this.level_obstaces = [{"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 1}, {"goalies": 1, "defenders": 0, "ball_chasers": 1}, {"goalies": 1, "defenders": 1, "ball_chasers": 0}, {"goalies": 1, "defenders": 1, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 1}, {"goalies": 1, "defenders": 2, "ball_chasers": 2}]
         this.defenders = []
         this.ball_chasers = []
         this.speed_bumps = []
         this.title = true;
-        // document.body.classList.add('blurred');
-
         // For collision debugging
         this.wireframes = [
             new Wireframe([-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [-1, -1, 1]),
@@ -120,9 +117,6 @@ export class SoccerShootout extends Scene {
             face_texture: new Material(new defs.Textured_Phong(),
                 {color: hex_color("#000000"), ambient: 0.9, diffusivity: 0.6, specularity: 0.1,
                 texture: new Texture("assets/angry2.png", "NEAREST")}),
-            face_texture2: new Material(new defs.Textured_Phong(),
-                {color: hex_color("#000000"), ambient: 0.9, diffusivity: 0.6, specularity: 0.1,
-                texture: new Texture("assets/angry3.png", "NEAREST")}),
             grass_mat: new Material(new defs.Phong_Shader(),
                 {ambient: 0.4, diffusivity: 0.8, specularity: 0, color: hex_color("#7CFC00")}),
             grass_texture: new Material(new defs.Textured_Phong(),
@@ -178,7 +172,6 @@ export class SoccerShootout extends Scene {
         this.key_triggered_button("Kick", ["Enter"], () => {
             if(this.title){
                 this.title = false;
-                document.body.classList.remove('blurred');
             }
             if(!this.already_kicked){
                 let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(50*this.power);
@@ -202,24 +195,21 @@ export class SoccerShootout extends Scene {
     }
 
     reset() {
-        this.materials.face_texture = new Material(new defs.Textured_Phong(),
-        {color: hex_color("#000000"), ambient: 0.9, diffusivity: 0.6, specularity: 0.1,
-        texture: new Texture("assets/angry2.png", "NEAREST")});
         this.ball.reset(ball_initial_position)
         this.already_kicked = false
         this.goalie_pos = [0, -3.5, -38]
         this.defenders = []
         this.ball_chasers = []
         this.speed_bumps = []
-        for (let index = 0; index < this.level_obstacles[this.level]["defenders"]; index++){
+        for (let index = 0; index < this.level_obstaces[this.level]["defenders"]; index++){
             let defender = new Defender(this.x_range, this.y_range)
             this.defenders.push(defender)
         }
-        for (let index = 0; index < this.level_obstacles[this.level]["ball_chasers"]; index++){
+        for (let index = 0; index < this.level_obstaces[this.level]["ball_chasers"]; index++){
             let ball_chaser = new Ball_Chaser(this.x_range, this.y_range)
             this.ball_chasers.push(ball_chaser)
         }
-        for (let index = 0; index < this.level_obstacles[this.level]["speed_bumps"]; index++){
+        for (let index = 0; index < this.level_obstaces[this.level]["speed_bumps"]; index++){
             let speed_bump = new Speed_Bump(this.x_range, this.y_range)
             this.speed_bumps.push(speed_bump)
         }
@@ -231,7 +221,8 @@ export class SoccerShootout extends Scene {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
 
-    
+        
+
         if (!context.scratchpad.controls) {
             context.scratchpad.controls = new defs.Movement_Controls();
             // this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
@@ -293,78 +284,19 @@ export class SoccerShootout extends Scene {
         let power_color = color(red, blue, green, 1);
         this.shapes.circle.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
         
-        // Draw ball shadow
-        const ball_radius = 1/* Set the actual radius of the ball here */;
-        const shadow_radius = ball_radius + this.ball.position[1] * 0.06/* Set a scaling factor here */;
-        const transparency_factor = .1/* Set a factor for transparency here */;
-        let shadow_tr = Mat4.scale(shadow_radius, shadow_radius, shadow_radius).times(Mat4.identity());
-        shadow_tr = Mat4.translation(this.ball.position[0], -1, this.ball.position[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(shadow_tr);
-        const alpha = 0.9 - transparency_factor * shadow_radius; // Calculate alpha based on the scaling factor
-        const shadow_color = color(0, 0, 0, alpha); // Set power circle color to black with adjusted transparency
-        if(this.already_kicked){
-            this.shapes.circle.draw(context, program_state, shadow_tr, this.materials.power_mat.override(shadow_color));
-        }
+                // Draw circle shadow for ball
+                const ball_radius = 1/* Set the actual radius of the ball here */;
+                const shadow_radius = ball_radius + this.ball.position[1] * 0.06/* Set a scaling factor here */;
+                const transparency_factor = .1/* Set a factor for transparency here */;
+                let shadow_tr = Mat4.scale(shadow_radius, shadow_radius, shadow_radius).times(Mat4.identity());
+                shadow_tr = Mat4.translation(this.ball.position[0], -0.9, this.ball.position[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(shadow_tr);
+                const alpha = 1 - transparency_factor * shadow_radius; // Calculate alpha based on the scaling factor
+                const shadow_color = color(0, 0, 0, alpha); // Set power circle color to black with adjusted transparency
+                if(this.already_kicked){
+                    this.shapes.circle.draw(context, program_state, shadow_tr, this.materials.power_mat.override(shadow_color));
+                }
 
-
-        //Draw Field Lines:
-        this.rectangle_length = 0.1; // Initial length
-        let rectangle_tr = Mat4.translation(0, -1.4, -39).times(Mat4.scale(70, 0.1, this.rectangle_length)); // Adjust the scale as needed
-        this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.ball_mat);
         
-        rectangle_tr = Mat4.translation(0, -1.4, 10).times(Mat4.scale(40, 0.1, this.rectangle_length));
-        this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.ball_mat);
-
-        rectangle_tr = Mat4.translation(0, -1.4, -23).times(Mat4.scale(18, 0.1, this.rectangle_length));
-        this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.ball_mat);
-
-        const width = 0.1;
-        const inner_length = 8;
-        const mid_length = 24.5;
-        const outer_length = 60;
-        const rotation_angle = Math.PI / 2;
-
-        //Draw inner bounds
-        const translation_vectorIL = vec3(-18, -1.3, -31);  // Adjust as needed
-        const rectangle_transformIL = Mat4.translation(...translation_vectorIL)
-            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
-            .times(Mat4.scale(width, inner_length, 1));
-        this.shapes.rectangle.draw(context, program_state, rectangle_transformIL, this.materials.ball_mat);
-
-        const translation_vectorIR = vec3(18, -1.3, -31);  // Adjust as needed
-        const rectangle_transformIR = Mat4.translation(...translation_vectorIR)
-            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
-            .times(Mat4.scale(width, inner_length, 1));
-        this.shapes.rectangle.draw(context, program_state, rectangle_transformIR, this.materials.ball_mat);
-
-        //Draw mid bounds
-        const translation_vectorMR = vec3(40, -1.3, -14.5);  // Adjust as needed
-        const rectangle_transformMR = Mat4.translation(...translation_vectorMR)
-            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
-            .times(Mat4.scale(width, mid_length, 1));
-        this.shapes.rectangle.draw(context, program_state, rectangle_transformMR, this.materials.ball_mat);
-
-        const translation_vectorML = vec3(-40, -1.3, -14.5);  // Adjust as needed
-        const rectangle_transformML = Mat4.translation(...translation_vectorML)
-            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
-            .times(Mat4.scale(width, mid_length, 1));
-        this.shapes.rectangle.draw(context, program_state, rectangle_transformML, this.materials.ball_mat);
-
-        //Draw outer bounds
-        const translation_vectorOR = vec3(70, -1.3, 21);  // Adjust as needed
-        const rectangle_transformOR = Mat4.translation(...translation_vectorOR)
-            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
-            .times(Mat4.scale(width, outer_length, 1));
-        this.shapes.rectangle.draw(context, program_state, rectangle_transformOR, this.materials.ball_mat);
-
-        const translation_vectorOL = vec3(-70, -1.3, 21);  // Adjust as needed
-        const rectangle_transformOL = Mat4.translation(...translation_vectorOL)
-            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
-            .times(Mat4.scale(width, outer_length, 1));
-        this.shapes.rectangle.draw(context, program_state, rectangle_transformOL, this.materials.ball_mat);
-
-
-
-
         // Transform Goal:
         const upright_tilt = Mat4.rotation(Math.PI / 2,1,0,0)
         let goal_translation = Mat4.translation(0,20,-40).times(upright_tilt)
@@ -390,29 +322,25 @@ export class SoccerShootout extends Scene {
         let goalie_tr = Mat4.identity()
 
         //Draw Goalie
-        if (this.level_obstacles[this.level]["goalies"] == 1){
+        if (this.level_obstaces[this.level]["goalies"] == 1){
             goalie_tr = Mat4.translation(this.goalie_pos[0], this.goalie_pos[1], this.goalie_pos[2]).times(Mat4.rotation(-Math.PI / 2, 1, 0, 0));
             this.goalie_tr = goalie_tr;
              //initialize the location of goalie's body
-            let head = goalie_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
+             let head = goalie_tr.times(Mat4.translation(0, 0, 6.6).times(Mat4.rotation(Math.PI / 2, 1, 0, 0).times(Mat4.rotation(-Math.PI / 2, 0, 1, 0).times(Mat4.scale(1, 1, 1)).times(Mat4.identity()))));
             let body = goalie_tr.times(Mat4.translation(0,0,4).times(Mat4.scale(0.75,0.75,3)).times(Mat4.identity()));
             let left_hand = goalie_tr.times(Mat4.translation(-1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
             let right_hand = goalie_tr.times(Mat4.translation(1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
 
             //draw the goalie
-            if(this.ball.goal){
-            this.shapes.ball.draw(context, program_state, head, this.materials.face_texture2);
-            }
             this.shapes.ball.draw(context, program_state, head, this.materials.face_texture);
             this.shapes.ball.draw(context, program_state, left_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
             this.shapes.ball.draw(context, program_state, right_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
             this.shapes.cylinder.draw(context, program_state, body, this.materials.ball_mat.override(hex_color("#f25003")));
             this.moveGoalie(dt)
 
-            //draw goalie shadow
             const goalie_shadow_radius = 2/* Set the shadow radius for the goalie */;
             let goalie_shadow_tr = Mat4.scale(goalie_shadow_radius, goalie_shadow_radius, goalie_shadow_radius).times(Mat4.identity());
-            goalie_shadow_tr = Mat4.translation(this.goalie_pos[0], -1, this.goalie_pos[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(goalie_shadow_tr);
+            goalie_shadow_tr = Mat4.translation(this.goalie_pos[0], -0.9, this.goalie_pos[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(goalie_shadow_tr);
 
             const goalie_shadow_alpha = 0.75/* Set the transparency factor for the goalie shadow */;
             const goalie_shadow_color = color(0, 0, 0, goalie_shadow_alpha);
@@ -422,41 +350,20 @@ export class SoccerShootout extends Scene {
 
         }
         
-        //Draw Defenders
         for (let index = 0; index < this.defenders.length; index++){
             this.defenders[index].move(dt)
-            if (this.ball.goal&&this.already_kicked){
-                this.materials.face_texture = this.materials.face_texture2;
-            }
-            // Draw the defender
-            this.defenders[index].draw(context, program_state, this.shapes, this.materials);
-
-            //draw defenders shadow
-            let defender_shadow_tr = Mat4.scale(2,2,2).times(Mat4.identity());
-            defender_shadow_tr = Mat4.translation(this.defenders[index].x_pos, -1, this.defenders[index].y_pos).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(defender_shadow_tr);
-            const defender_shadow_color = color(0, 0, 0, 0.75);
-            this.shapes.circle.draw(context, program_state, defender_shadow_tr, this.materials.power_mat.override(defender_shadow_color));
+            this.defenders[index].draw(context, program_state, this.materials)
         }
 
-        //Draw Speed Bumps
         for (let index = 0; index < this.speed_bumps.length; index++){
-            this.speed_bumps[index].draw(context, program_state, this.shapes, this.materials)
+            this.speed_bumps[index].draw(context, program_state, this.materials)
         }
 
-        //Draw Ball Chasers
         for (let index = 0; index < this.ball_chasers.length; index++){
             if (this.already_kicked){
                 this.ball_chasers[index].move(dt, this.ball.position)
             }
-            if (this.ball.goal&&this.already_kicked){
-                this.materials.face_texture = this.materials.face_texture2;
-            }
-            this.ball_chasers[index].draw(context, program_state, this.shapes, this.materials)
-            //draw chasers shadow
-            let chasers_shadow_tr = Mat4.scale(2,2,2).times(Mat4.identity());
-            chasers_shadow_tr = Mat4.translation(this.ball_chasers[index].x_pos, -1, this.ball_chasers[index].y_pos).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(chasers_shadow_tr);
-            const chasers_shadow_color = color(0, 0, 0, 0.75);
-            this.shapes.circle.draw(context, program_state, chasers_shadow_tr, this.materials.power_mat.override(chasers_shadow_color));
+            this.ball_chasers[index].draw(context, program_state, this.materials)
         }
 
         
@@ -476,8 +383,8 @@ export class SoccerShootout extends Scene {
             0.8, 0.8, 0.8,
             0.3, 0.3, 0.3, 0.3,
         ];
-        // console.log(this.level, this.level_obstacles[this.level], this.defenders)
-        if (this.level_obstacles[this.level]["goalies"] == 1){
+        // console.log(this.level, this.level_obstaces[this.level], this.defenders)
+        if (this.level_obstaces[this.level]["goalies"] == 1){
             goalie_tr = Mat4.translation(0,3.5,0).times(goalie_tr).times(Mat4.scale(1,1,4))
             collidable_obstacles.push(goalie_tr)
             restitution_coefs.push(0.8)
@@ -504,7 +411,6 @@ export class SoccerShootout extends Scene {
 
         if(this.ball.goal){
             if (this.scored_this_possession == null) {
-                this.points+=Math.round((Math.max(1,this.level)*100)/Math.max(this.misses,1));
                 this.goals++;
                 this.misses = 0;
                 this.lost = false;
@@ -512,7 +418,7 @@ export class SoccerShootout extends Scene {
             }
             if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
                 this.level += 1
-                this.level = this.level % this.level_obstacles.length
+                this.level = this.level % this.level_obstaces.length
                 this.reset();
             }
         }   
@@ -522,17 +428,11 @@ export class SoccerShootout extends Scene {
             }
             if (this.missed_this_possession != null && t - this.missed_this_possession > 3) {
                 this.misses += 1;
-                // texteditor.updateLifeCounter(this.misses);
                 if(this.misses > 3){
                     this.lost = true;
                     this.level = 0;
                     this.misses = 0;
-                    this.points = 0;
                     //texteditor.youLose(this.lost);
-                    // document.getElementById('score-container').style.display = 'none';
-                    // document.getElementById('miss-container').style.display = 'none';
-                    // document.getElementById('point-container').style.display = 'none';
-                    // document.getElementById('level-container').style.display = 'none';
                 }
                 this.reset();
             }
@@ -565,9 +465,7 @@ export class SoccerShootout extends Scene {
         texteditor.updateMisses(this.misses);
         texteditor.updateLevels(this.level)
         texteditor.youLose(this.lost);
-        texteditor.updateLifeCounter(this.misses);
         texteditor.updateScore(this.level);
-        texteditor.updatePoints(this.points);
     }
 
 

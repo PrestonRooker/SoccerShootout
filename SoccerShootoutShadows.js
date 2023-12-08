@@ -146,7 +146,7 @@ export class SoccerShootoutShadows extends Scene {
                 color_texture: new Texture("assets/angry2.png", "LINEAR_MIPMAP_LINEAR")
             }),
             face_texture2: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: hex_color("#f1c27d"), ambient: .35, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: hex_color("#f1c27d"), ambient: .45, diffusivity: 0.1, specularity: 0.2, smoothness: 64,
                 light_depth_texture: null,
                 color_texture: new Texture("assets/angry3.png", "LINEAR_MIPMAP_LINEAR")
             }),
@@ -701,7 +701,7 @@ export class SoccerShootoutShadows extends Scene {
         this.light_view_target = vec4(0, 0, 0, 1);
         this.light_field_of_view = 300 * Math.PI / 180; // 130 degree
 
-        program_state.lights = [new Light(this.light_position, this.light_color, 10000)];
+        program_state.lights = [new Light(this.light_position, this.light_color, 1000000)];
 
         // Step 1: set the perspective and camera to the POV of light
         const light_view_mat = Mat4.look_at(
