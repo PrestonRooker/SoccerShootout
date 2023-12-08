@@ -72,6 +72,7 @@ export class SoccerShootout extends Scene {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
 
+        this.dimensions = [0, 0];
         this.arrow_ang_x = 0
         this.arrow_ang_y = 0
         this.x_range = [-7, 7]
@@ -211,7 +212,12 @@ export class SoccerShootout extends Scene {
             program_state.set_camera(this.initial_camera_location);
         }
 
-        
+        const dimensions = [ window.innerWidth, window.innerHeight];
+        if (dimensions.some((val, i) => val !== this.dimensions[i])) {
+            context.set_size(dimensions);
+            this.dimensions = dimensions;
+            // console.log(...dimensions);
+        }
         
         program_state.projection_transform = Mat4.perspective(
             Math.PI / 4, context.width / context.height, .1, 1000);

@@ -28,7 +28,7 @@ const Canvas_Widget = widgets.Canvas_Widget =
                 Object.assign(options, initial_scenes[0].widget_options);
             Object.assign(this, defaults, options)
 
-            const rules = [".canvas-widget { width: 1080px; background: White; margin:auto }",
+            const rules = [".canvas-widget { background: White; margin: 0 }",
                 ".canvas-widget canvas { width: 1080px; height: 600px; margin-bottom:-3px }"];
 
             if (document.styleSheets.length == 0) document.head.appendChild(document.createElement("style"));
@@ -122,7 +122,7 @@ const Controls_Widget = widgets.Controls_Widget =
             for (const r of rules) document.styleSheets[document.styleSheets.length - 1].insertRule(r, 0)
 
             const table = element.appendChild(document.createElement("table"));
-            table.className = "control-box";
+            table.className = "control-box hide";
             this.row = table.insertRow(0);
 
             this.panels = [];

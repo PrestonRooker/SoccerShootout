@@ -23,7 +23,6 @@
         <p id="level-text"></p>
     </div>
     <p id="goal-text" class="splash-text">Goal!</p>
-    </div>
     <p id="lose-text" class="splash-text">You Lose! <br> Press enter to shoot again </p>
 </div>
 <script type=module>
@@ -34,7 +33,9 @@
     // Import the file that defines a scene.
     const scenes = [Main_Scene, ...Additional_Scenes].map(scene => new scene());
     // This line creates your scene.
-    new Canvas_Widget(element_to_replace, scenes);
+    new Canvas_Widget(element_to_replace, scenes, {
+        make_code_nav: false,
+    });
 </script>
 
 </body>
