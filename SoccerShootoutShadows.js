@@ -120,9 +120,9 @@ export class SoccerShootoutShadows extends Scene {
 
         this.materials = {
             grass_texture: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: color(.27, 0.74, .26, 1), ambient: 0.5, diffusivity: 0.5, specularity: 0, smoothness: 0,
+                color: hex_color("#669c2a"), ambient: 0.5, diffusivity: 0.5, specularity: 0, smoothness: 0,
                 light_depth_texture: null,
-                color_texture: new Texture("assets/grass4.png", "LINEAR_MIPMAP_LINEAR")
+                color_texture: new Texture("assets/grass.jpg", "LINEAR_MIPMAP_LINEAR")
             }),
             ball_texture: new Material(new Shadow_Textured_Phong_Shader(1), {
                 color: color(0.5, .5, .5, 1), ambient: .5, diffusivity: 0.3, specularity: 0.2, smoothness: 100,
@@ -176,7 +176,7 @@ export class SoccerShootoutShadows extends Scene {
             }),
         }
 
-        this.shapes.grass.arrays.texture_coord = this.shapes.grass.arrays.texture_coord.map(x => x.times(4));
+        this.shapes.grass.arrays.texture_coord = this.shapes.grass.arrays.texture_coord.map(x => x.times(25));
 
         this.power = 0;
         this.ball = new Ball(ball_initial_position)
