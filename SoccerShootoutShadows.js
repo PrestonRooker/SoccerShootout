@@ -120,12 +120,12 @@ export class SoccerShootoutShadows extends Scene {
 
         this.materials = {
             grass_texture: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: color(.5, .5, .5, 1), ambient: .5, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: color(.27, 0.74, .26, 1), ambient: 0.5, diffusivity: 0.5, specularity: 0, smoothness: 0,
                 light_depth_texture: null,
-                color_texture: new Texture("assets/grass4.png", "NEAREST")
+                color_texture: new Texture("assets/grass4.png", "LINEAR_MIPMAP_LINEAR")
             }),
             ball_texture: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: color(.5, .5, .5, 1), ambient: .3, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: color(0.5, .5, .5, 1), ambient: .5, diffusivity: 0.3, specularity: 0.2, smoothness: 100,
                 light_depth_texture: null,
                 color_texture: new Texture("assets/soccerball.png", "NEAREST")
             }),
@@ -139,12 +139,12 @@ export class SoccerShootoutShadows extends Scene {
                 color_texture: new Texture("assets/net.png", "LINEAR_MIPMAP_LINEAR")
             }),
             face_texture: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: color(.5, .5, .5, 1), ambient: .3, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: hex_color("#f1c27d"), ambient: .45, diffusivity: 0.1, specularity: 0.2, smoothness: 64,
                 light_depth_texture: null,
                 color_texture: new Texture("assets/angry2.png", "LINEAR_MIPMAP_LINEAR")
             }),
             face_texture2: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: color(.5, .5, .5, 1), ambient: .3, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: hex_color("#f1c27d"), ambient: .3, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
                 light_depth_texture: null,
                 color_texture: new Texture("assets/angry3.png", "LINEAR_MIPMAP_LINEAR")
             }),
@@ -154,19 +154,19 @@ export class SoccerShootoutShadows extends Scene {
                 color_texture:  hex_color("#FFFFFF")
             }),
             hands_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: hex_color("#a18a68"), ambient: .7, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: hex_color("#f1c27d"), ambient: .7, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
                 light_depth_texture: null, 
             }),
             body_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: hex_color("#8B0000"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 64,
+                color: hex_color("#f25003"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 100,
                 light_depth_texture: null
             }),
             speed_bump_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: hex_color("#FCFCFC"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 64,
+                color: hex_color("#985713"), ambient: .7, diffusivity: 0.4, specularity: 0.1, smoothness: 30,
                 light_depth_texture: null
             }),
             dome_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: color(.5, .5, .5, 1), ambient: 0.6, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: color(.5, .5, .8, 1), ambient: 0.6, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
                 light_depth_texture: null,
                 color_texture:  new Texture("assets/sky12.jpg", "NEAREST")
             }),
@@ -505,9 +505,9 @@ export class SoccerShootoutShadows extends Scene {
                 this.shapes.ball.draw(context, program_state, head, shadow_pass? this.materials.face_texture2 : this.pure);
             }
             this.shapes.ball.draw(context, program_state, head, shadow_pass? this.materials.face_texture : this.pure);
-            this.shapes.ball.draw(context, program_state, left_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color('#505050')}) : this.pure);
-            this.shapes.ball.draw(context, program_state, right_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color('#505050')}) : this.pure);
-            this.shapes.cylinder.draw(context, program_state, body, shadow_pass? this.materials.body_mat.override({color:hex_color("#DFFF00")}) : this.pure);
+            this.shapes.ball.draw(context, program_state, left_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color("#f1c27d")}) : this.pure);
+            this.shapes.ball.draw(context, program_state, right_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color("#f1c27d")}) : this.pure);
+            this.shapes.cylinder.draw(context, program_state, body, shadow_pass? this.materials.body_mat : this.pure);
             this.moveGoalie(dt)
 
         }
@@ -689,6 +689,7 @@ export class SoccerShootoutShadows extends Scene {
         }
 
         // The position of the light
+        //this.light_position = vec4(0, 100, 0, 1);
         this.light_position = Mat4.rotation(t / 1500, 0, 1, 0).times(vec4(30, 6, 1, 1));
         // The color of the light
         this.light_color = color(1,1,1,0);
@@ -698,7 +699,7 @@ export class SoccerShootoutShadows extends Scene {
         this.light_view_target = vec4(0, 0, 0, 1);
         this.light_field_of_view = 300 * Math.PI / 180; // 130 degree
 
-        program_state.lights = [new Light(this.light_position, this.light_color, 3000)];
+        program_state.lights = [new Light(this.light_position, this.light_color, 10000)];
 
         // Step 1: set the perspective and camera to the POV of light
         const light_view_mat = Mat4.look_at(
