@@ -72,6 +72,12 @@ export class SoccerShootout extends Scene {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
 
+        this.background_music = new Audio('assets/backgroundmusic(chosic.com).mp3');
+        this.background_music.volume = 0.4;
+        this.background_music.loop = true;
+        this.has_music_started_playing = false;
+        this.mute = false;
+
         this.dimensions = [0, 0];
         this.arrow_ang_x = 0
         this.arrow_ang_y = 0
@@ -85,6 +91,7 @@ export class SoccerShootout extends Scene {
         this.defenders = []
         this.ball_chasers = []
         this.speed_bumps = []
+        this.title = true;
         // For collision debugging
         this.wireframes = [
             new Wireframe([-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [-1, -1, 1]),
@@ -163,12 +170,21 @@ export class SoccerShootout extends Scene {
         this.key_triggered_button("Aim Down", ["ArrowDown"], () => this.arrow_ang_y = Math.max(this.arrow_ang_y - Math.PI/64,0));
         // this.new_line();
         this.key_triggered_button("Kick", ["Enter"], () => {
+            if(this.title){
+                this.title = false;
+            }
             if(!this.already_kicked){
                 let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(50*this.power);
                 this.ball.velocity[0] += dir_vec[0];
                 this.ball.velocity[1] += dir_vec[1];
                 this.ball.velocity[2] += dir_vec[2];
-                this.already_kicked = true
+                this.already_kicked = true;
+                
+            }
+            if(!this.has_music_started_playing){
+                this.has_music_started_playing = true;
+                this.background_music.play();
+                this.background_music.autoplay = true;
             }
         });
         // this.new_line();
@@ -204,6 +220,9 @@ export class SoccerShootout extends Scene {
     display(context, program_state) {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
+
+        
+
         if (!context.scratchpad.controls) {
             context.scratchpad.controls = new defs.Movement_Controls();
             // this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
@@ -231,6 +250,10 @@ export class SoccerShootout extends Scene {
 
         const light_position = vec4(0, 100, 0, 1);
         program_state.lights = [new Light(light_position, hex_color("#fdfbd3"), 10000)];
+
+        
+        texteditor.displayTitleScreen(this.title);
+        
         
         //Draw grass floor
         let grass_tr = Mat4.translation(0,-51.4,0).times(Mat4.scale(domeRadius,50,domeRadius).times(Mat4.identity()))
@@ -329,18 +352,18 @@ export class SoccerShootout extends Scene {
         
         for (let index = 0; index < this.defenders.length; index++){
             this.defenders[index].move(dt)
-            this.defenders[index].draw(context, program_state, this.materials)
+            this.defenders[index].draw(context, program_state, this.shapes, this.materials)
         }
 
         for (let index = 0; index < this.speed_bumps.length; index++){
-            this.speed_bumps[index].draw(context, program_state, this.materials)
+            this.speed_bumps[index].draw(context, program_state, this.shapes, this.materials)
         }
 
         for (let index = 0; index < this.ball_chasers.length; index++){
             if (this.already_kicked){
                 this.ball_chasers[index].move(dt, this.ball.position)
             }
-            this.ball_chasers[index].draw(context, program_state, this.materials)
+            this.ball_chasers[index].draw(context, program_state, this.shapes, this.materials)
         }
 
         

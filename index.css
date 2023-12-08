@@ -38,12 +38,14 @@ html, body {
 
 .splash-text {
     visibility: hidden;
-    transform: translate(-50%, -50%);
     font-family: Poppins;
     position: absolute;
-    left: 50%;
-    text-align: center;
     margin: 0;
+}
+.centered {
+    text-align: center;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 #goal-text {
     color: lime;
@@ -54,6 +56,13 @@ html, body {
     color: rgb(255, 0, 0);
     top: 5rem;
     font-size: 2rem;
+}
+#title-text {
+    color: rgb(254, 243, 243);
+    bottom: 1rem;
+    left: 1rem;
+    font-size: 1.5rem;
+    text-align: left;
 }
 
 @font-face {

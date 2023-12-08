@@ -22,3 +22,8 @@ export function updateLevels(value){
     const levelElement = document.getElementById('level-text');
     levelElement.textContent = `Level: ${value}`;
 }
+
+export function displayTitleScreen(show){
+    const titleElement = document.getElementById('title-text');
+    titleElement.style.visibility = show ? "visible" : "hidden";
+}
