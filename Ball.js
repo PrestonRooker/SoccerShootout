@@ -6,6 +6,9 @@ const gravity = 20;
 
 export default class Ball {
     constructor(initialPosition) {
+        this.goal_sound = new Audio('assets/goal.mp3')
+        this.collision_sound = new Audio('assets/collision.wav')
+        this.collision_sound.volume = 0.6;
         this.reset(initialPosition);
     }
 
@@ -19,11 +22,7 @@ export default class Ball {
         this.roll_ang_x = 0
         this.roll_ang_z = 0
         this.roll_sp = 0
-        this.goal_sound = new Audio('assets/goal.mp3')
         this.playing_goal_sound = false
-        this.collision_sound = new Audio('assets/collision.wav')
-        this.collision_sound.volume = 0.6;
-        
     }
 
     roll(dt){
