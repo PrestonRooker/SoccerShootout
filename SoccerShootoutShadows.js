@@ -139,7 +139,7 @@ export class SoccerShootoutShadows extends Scene {
                 color_texture: new Texture("assets/net.png", "LINEAR_MIPMAP_LINEAR")
             }),
             face_texture: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: hex_color("#f1c27d"), ambient: .45, diffusivity: 0.1, specularity: 0.2, smoothness: 64,
+                color: hex_color("#f1c27d"), ambient: .5, diffusivity: 0.1, specularity: 0.2, smoothness: 64,
                 light_depth_texture: null,
                 color_texture: new Texture("assets/angry2.png", "LINEAR_MIPMAP_LINEAR")
             }),
@@ -212,6 +212,7 @@ export class SoccerShootoutShadows extends Scene {
         this.key_triggered_button("Aim Up", ["ArrowUp"], () => this.arrow_ang_y = Math.min(this.arrow_ang_y + Math.PI/64,Math.PI/2));
         this.key_triggered_button("Aim Down", ["ArrowDown"], () => this.arrow_ang_y = Math.max(this.arrow_ang_y - Math.PI/64,0));
         // this.new_line();
+        this.key_triggered_button("Skip to Final Level", ["6"], () => {this.level = 6; this.reset()})
         this.key_triggered_button("Kick", ["Enter"], () => {
             if(this.title){
                 this.title = false;
@@ -581,7 +582,7 @@ export class SoccerShootoutShadows extends Scene {
             }
             if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
                 this.level += 1
-                this.level = this.level % this.level_obstaces.length
+                this.level = Math.min(this.level, this.level_obstaces.length - 1)
                 this.reset();
             }
         }   
