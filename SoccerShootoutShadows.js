@@ -89,6 +89,7 @@ export class SoccerShootoutShadows extends Scene {
         this.y_range = [-10, -38]
         this.goalie_pos = [0, -3.5, -38]
         this.level = 0
+        this.points = 0;
         this.lost = false;
         this.misses = 0;
         this.level_obstaces = [{"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 1, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 1, "defenders": 0, "ball_chasers": 0, "speed_bumps": 2}, {"goalies": 1, "defenders": 1, "ball_chasers": 0, "speed_bumps": 2}, {"goalies": 1, "defenders": 1, "ball_chasers": 1, "speed_bumps": 2}, {"goalies": 1, "defenders": 2, "ball_chasers": 1, "speed_bumps": 2}, {"goalies": 1, "defenders": 2, "ball_chasers": 2, "speed_bumps": 2}]
@@ -483,6 +484,7 @@ export class SoccerShootoutShadows extends Scene {
         if(this.ball.goal){
             if (this.scored_this_possession == null) {
                 this.goals++;
+                this.points+=Math.round((Math.max(1,this.level)*100)/Math.max(this.misses,1));
                 this.misses = 0;
                 this.lost = false;
                 this.scored_this_possession = t;
@@ -499,11 +501,17 @@ export class SoccerShootoutShadows extends Scene {
             }
             if (this.missed_this_possession != null && t - this.missed_this_possession > 3) {
                 this.misses += 1;
+                // texteditor.updateLifeCounter(this.misses);
                 if(this.misses > 3){
                     this.lost = true;
                     this.level = 0;
                     this.misses = 0;
+                    this.points = 0;
                     //texteditor.youLose(this.lost);
+                    // document.getElementById('score-container').style.display = 'none';
+                    // document.getElementById('miss-container').style.display = 'none';
+                    // document.getElementById('point-container').style.display = 'none';
+                    // document.getElementById('level-container').style.display = 'none';
                 }
                 this.reset();
             }
@@ -536,7 +544,9 @@ export class SoccerShootoutShadows extends Scene {
         texteditor.updateMisses(this.misses);
         texteditor.updateLevels(this.level)
         texteditor.youLose(this.lost);
+        texteditor.updateLifeCounter(this.misses);
         texteditor.updateScore(this.level);
+        texteditor.updatePoints(this.points);
 
     }
 
