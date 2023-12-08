@@ -255,6 +255,16 @@ export class SoccerShootout extends Scene {
         let power_color = color(red, blue, green, 1);
         this.shapes.circle.draw(context, program_state, power_tr, this.materials.power_mat.override(power_color))
         
+                // Draw circle shadow for ball
+                const ball_radius = 1/* Set the actual radius of the ball here */;
+                const shadow_radius = ball_radius + this.ball.position[1] * 0.06/* Set a scaling factor here */;
+                const transparency_factor = .1/* Set a factor for transparency here */;
+                let shadow_tr = Mat4.scale(shadow_radius, shadow_radius, shadow_radius).times(Mat4.identity());
+                shadow_tr = Mat4.translation(this.ball.position[0], -0.9, this.ball.position[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(shadow_tr);
+                const alpha = 1 - transparency_factor * shadow_radius; // Calculate alpha based on the scaling factor
+                const shadow_color = color(0, 0, 0, alpha); // Set power circle color to black with adjusted transparency
+                this.shapes.circle.draw(context, program_state, shadow_tr, this.materials.power_mat.override(shadow_color));
+
         
         // Transform Goal:
         const upright_tilt = Mat4.rotation(Math.PI / 2,1,0,0)
@@ -296,6 +306,17 @@ export class SoccerShootout extends Scene {
             this.shapes.ball.draw(context, program_state, right_hand, this.materials.ball_mat.override(hex_color("#f1c27d")));
             this.shapes.cylinder.draw(context, program_state, body, this.materials.ball_mat.override(hex_color("#f25003")));
             this.moveGoalie(dt)
+
+            const goalie_shadow_radius = 2/* Set the shadow radius for the goalie */;
+            let goalie_shadow_tr = Mat4.scale(goalie_shadow_radius, goalie_shadow_radius, goalie_shadow_radius).times(Mat4.identity());
+            goalie_shadow_tr = Mat4.translation(this.goalie_pos[0], -0.9, this.goalie_pos[2]).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(goalie_shadow_tr);
+
+            const goalie_shadow_alpha = 0.75/* Set the transparency factor for the goalie shadow */;
+            const goalie_shadow_color = color(0, 0, 0, goalie_shadow_alpha);
+
+            this.shapes.circle.draw(context, program_state, goalie_shadow_tr, this.materials.power_mat.override(goalie_shadow_color));
+
+
         }
         
         for (let index = 0; index < this.defenders.length; index++){

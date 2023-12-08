@@ -21,6 +21,10 @@ class Defender {
             ball: new defs.Subdivision_Sphere(4),
             cylinder: new defs.Capped_Cylinder(30, 30),
         }
+        this.materials = {
+            power_mat: new Material(new defs.Phong_Shader(),
+            {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")})
+        }
     }
 
     // materials should contain "face_texture" and "ball_mat"
@@ -38,6 +42,16 @@ class Defender {
         this.shapes.ball.draw(context, program_state, d_right_hand, materials.ball_mat.override(hex_color("#f1c27d")));
         this.shapes.cylinder.draw(context, program_state, d_body, materials.ball_mat.override(hex_color("#00ffff")));
         this.defender_tr = Mat4.translation(0,3.5,0).times(this.defender_tr).times(Mat4.scale(1,1,4))
+
+        //draw shadow
+        // const shadow_radius = 2/* Set the shadow radius for the goalie */;
+        // let shadow_tr = Mat4.scale(shadow_radius, shadow_radius, shadow_radius).times(Mat4.identity());
+        // shadow_tr = Mat4.translation(this.x_pos, -0.9, this.y_pos).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(shadow_tr);
+
+        // const shadow_alpha = 0.75/* Set the transparency factor for the goalie shadow */;
+        // const shadow_color = color(0, 0, 0, shadow_alpha);
+
+        // this.shapes.circle.draw(context, program_state, shadow_tr, materials.power_mat.override(shadow_color));
     }
 
 
