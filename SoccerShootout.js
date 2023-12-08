@@ -119,7 +119,7 @@ export class SoccerShootout extends Scene {
                 {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("FCFCFC")}),
             net_texture: new Material(new defs.Textured_Phong(),
                 {ambient: 1, diffusivity: 0.1, specularity: 0.1,
-                texture: new Texture("assets/net.png", "NEAREST")}),
+                texture: new Texture("assets/net.png", "LINEAR_MIPMAP_LINEAR")}),
             obstacle: new Material(new defs.Phong_Shader(),
                 {ambient: 0.5, diffusivity: 0.5, specularity: 0, color: hex_color("#0000FF")}),
             post_color: new Material(new defs.Phong_Shader(),
