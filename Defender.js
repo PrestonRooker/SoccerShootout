@@ -34,16 +34,6 @@ class Defender {
         shapes.ball.draw(context, program_state, d_right_hand, materials.ball_mat.override(hex_color("#f1c27d")));
         shapes.cylinder.draw(context, program_state, d_body, materials.ball_mat.override(hex_color("#00ffff")));
         this.defender_tr = Mat4.translation(0,3.5,0).times(this.defender_tr).times(Mat4.scale(1,1,4))
-
-        //draw shadow
-        // const shadow_radius = 2/* Set the shadow radius for the goalie */;
-        // let shadow_tr = Mat4.scale(shadow_radius, shadow_radius, shadow_radius).times(Mat4.identity());
-        // shadow_tr = Mat4.translation(this.x_pos, -0.9, this.y_pos).times(Mat4.rotation(Math.PI / 2, 1, 0, 0)).times(shadow_tr);
-
-        // const shadow_alpha = 0.75/* Set the transparency factor for the goalie shadow */;
-        // const shadow_color = color(0, 0, 0, shadow_alpha);
-
-        // this.shapes.circle.draw(context, program_state, shadow_tr, materials.power_mat.override(shadow_color));
     }
 
 

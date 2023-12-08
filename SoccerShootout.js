@@ -221,7 +221,8 @@ export class SoccerShootout extends Scene {
         // display():  Called once per frame of animation.
         // Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
 
-    
+        
+
         if (!context.scratchpad.controls) {
             context.scratchpad.controls = new defs.Movement_Controls();
             // this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
@@ -351,18 +352,18 @@ export class SoccerShootout extends Scene {
         
         for (let index = 0; index < this.defenders.length; index++){
             this.defenders[index].move(dt)
-            this.defenders[index].draw(context, program_state, this.shapes, this.materials)
+            this.defenders[index].draw(context, program_state, this.materials)
         }
 
         for (let index = 0; index < this.speed_bumps.length; index++){
-            this.speed_bumps[index].draw(context, program_state, this.shapes, this.materials)
+            this.speed_bumps[index].draw(context, program_state, this.materials)
         }
 
         for (let index = 0; index < this.ball_chasers.length; index++){
             if (this.already_kicked){
                 this.ball_chasers[index].move(dt, this.ball.position)
             }
-            this.ball_chasers[index].draw(context, program_state, this.shapes, this.materials)
+            this.ball_chasers[index].draw(context, program_state, this.materials)
         }
 
         

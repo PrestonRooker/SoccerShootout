@@ -89,6 +89,7 @@ export class SoccerShootoutShadows extends Scene {
         this.y_range = [-10, -38]
         this.goalie_pos = [0, -3.5, -38]
         this.level = 0
+        this.points = 0;
         this.lost = false;
         this.misses = 0;
         this.level_obstaces = [{"goalies": 0, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 1, "defenders": 0, "ball_chasers": 0, "speed_bumps": 0}, {"goalies": 1, "defenders": 0, "ball_chasers": 0, "speed_bumps": 2}, {"goalies": 1, "defenders": 1, "ball_chasers": 0, "speed_bumps": 2}, {"goalies": 1, "defenders": 1, "ball_chasers": 1, "speed_bumps": 2}, {"goalies": 1, "defenders": 2, "ball_chasers": 1, "speed_bumps": 2}, {"goalies": 1, "defenders": 2, "ball_chasers": 2, "speed_bumps": 2}]
@@ -96,6 +97,8 @@ export class SoccerShootoutShadows extends Scene {
         this.ball_chasers = []
         this.speed_bumps = []
         this.title = true;
+        // document.body.classList.add('blurred');
+
         // For collision debugging
         this.wireframes = [
             new Wireframe([-1, -1, -1], [-1, 1, -1], [-1, 1, 1], [-1, -1, 1]),
@@ -114,16 +117,17 @@ export class SoccerShootoutShadows extends Scene {
             net: new defs.OpenCube(),
             goal: new defs.SoccerGoal(),
             cylinder: new defs.Capped_Cylinder(30, 30),
+            rectangle: new defs.Square(),
         };
 
         this.materials = {
             grass_texture: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: color(.5, .5, .5, 1), ambient: .5, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: hex_color("#669c2a"), ambient: 0.5, diffusivity: 0.5, specularity: 0, smoothness: 0,
                 light_depth_texture: null,
-                color_texture: new Texture("assets/grass4.png", "NEAREST")
+                color_texture: new Texture("assets/grass.jpg", "LINEAR_MIPMAP_LINEAR")
             }),
             ball_texture: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: color(.5, .5, .5, 1), ambient: .3, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: color(0.5, .5, .5, 1), ambient: .5, diffusivity: 0.3, specularity: 0.2, smoothness: 100,
                 light_depth_texture: null,
                 color_texture: new Texture("assets/soccerball.png", "NEAREST")
             }),
@@ -137,9 +141,14 @@ export class SoccerShootoutShadows extends Scene {
                 color_texture: new Texture("assets/net.png", "LINEAR_MIPMAP_LINEAR")
             }),
             face_texture: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: color(.5, .5, .5, 1), ambient: .3, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: hex_color("#f1c27d"), ambient: .5, diffusivity: 0.1, specularity: 0.2, smoothness: 64,
                 light_depth_texture: null,
                 color_texture: new Texture("assets/angry2.png", "LINEAR_MIPMAP_LINEAR")
+            }),
+            face_texture2: new Material(new Shadow_Textured_Phong_Shader(1), {
+                color: hex_color("#f1c27d"), ambient: .45, diffusivity: 0.1, specularity: 0.2, smoothness: 64,
+                light_depth_texture: null,
+                color_texture: new Texture("assets/angry3.png", "LINEAR_MIPMAP_LINEAR")
             }),
             post_color: new Material(new Shadow_Textured_Phong_Shader(1), {
                 color: color(.5, .5, .5, 1), ambient: .3, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
@@ -151,15 +160,15 @@ export class SoccerShootoutShadows extends Scene {
                 light_depth_texture: null, 
             }),
             body_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: hex_color("#f25003"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 64,
+                color: hex_color("#8B0000"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 100,
                 light_depth_texture: null
             }),
             speed_bump_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: hex_color("#FCFCFC"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 64,
+                color: hex_color("#985713"), ambient: .7, diffusivity: 0.4, specularity: 0.1, smoothness: 30,
                 light_depth_texture: null
             }),
             dome_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: color(.5, .5, .5, 1), ambient: 0.6, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: color(.5, .5, .8, 1), ambient: 0.6, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
                 light_depth_texture: null,
                 color_texture:  new Texture("assets/sky12.jpg", "NEAREST")
             }),
@@ -167,9 +176,13 @@ export class SoccerShootoutShadows extends Scene {
             {ambient: 0.6, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
             pure: new Material(new Color_Phong_Shader(), {
             }),
+            line_mat: new Material(new defs.Phong_Shader(),
+            {ambient: 1, diffusivity: 0.6, specularity: 0, color: hex_color("#FFFFFF")}),
+            pure: new Material(new Color_Phong_Shader(), {
+            }),
         }
 
-        this.shapes.grass.arrays.texture_coord = this.shapes.grass.arrays.texture_coord.map(x => x.times(4));
+        this.shapes.grass.arrays.texture_coord = this.shapes.grass.arrays.texture_coord.map(x => x.times(25));
 
         this.power = 0;
         this.ball = new Ball(ball_initial_position)
@@ -201,9 +214,11 @@ export class SoccerShootoutShadows extends Scene {
         this.key_triggered_button("Aim Up", ["ArrowUp"], () => this.arrow_ang_y = Math.min(this.arrow_ang_y + Math.PI/64,Math.PI/2));
         this.key_triggered_button("Aim Down", ["ArrowDown"], () => this.arrow_ang_y = Math.max(this.arrow_ang_y - Math.PI/64,0));
         // this.new_line();
+        this.key_triggered_button("Skip to Final Level", ["6"], () => {this.level = 6; this.reset()})
         this.key_triggered_button("Kick", ["Enter"], () => {
             if(this.title){
                 this.title = false;
+                document.body.classList.remove('blurred');
             }
             if(!this.already_kicked){
                 let dir_vec = this.arrow_tr.times(vec4(0,0,1,0)).times(50*this.power);
@@ -222,6 +237,10 @@ export class SoccerShootoutShadows extends Scene {
     }
 
     reset() {
+        this.materials.face_texture = new Material(new Shadow_Textured_Phong_Shader(1), {
+            color: hex_color("#f1c27d"), ambient: .45, diffusivity: 0.1, specularity: 0.2, smoothness: 64,
+            light_depth_texture: null,
+            color_texture: new Texture("assets/angry2.png", "LINEAR_MIPMAP_LINEAR")});
         this.ball.reset(ball_initial_position)
         this.already_kicked = false
         this.goalie_pos = [0, -3.5, -38]
@@ -386,6 +405,73 @@ export class SoccerShootoutShadows extends Scene {
         const panel_width = 80 / 5; // Same as the crossbar length
         const panel_height = 6; // Same as the post height
 
+        //Draw Field Lines
+        const width = 0.4;
+        const inner_length = 8;
+        const mid_length = 24.5;
+        const outer_length = 60;
+        const rotation_angle = Math.PI / 2;
+
+        //Draw Horizontal Lines
+        const translation_vectorH1 = vec3(0, -1.3, -39); 
+        const rectangle_transformH1 = Mat4.translation(...translation_vectorH1)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.rotation(rotation_angle, 0, 0, 1))
+            .times(Mat4.scale(0.5, 70, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformH1, this.materials.line_mat);
+
+        const translation_vectorH2 = vec3(0, -1.3, 10); 
+        const rectangle_transformH2 = Mat4.translation(...translation_vectorH2)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))  // Rotate about the x-axis
+            .times(Mat4.rotation(rotation_angle, 0, 0, 1))  // Rotate about the z-axis
+            .times(Mat4.scale(0.5, 40, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformH2, this.materials.line_mat);
+        
+        const translation_vectorH3 = vec3(0, -1.3, -23); 
+        const rectangle_transformH3 = Mat4.translation(...translation_vectorH3)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.rotation(rotation_angle, 0, 0, 1))
+            .times(Mat4.scale(0.5, 18, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformH3, this.materials.line_mat);
+
+        //Draw inner bounds
+        const translation_vectorIL = vec3(-18, -1.35, -31); 
+        const rectangle_transformIL = Mat4.translation(...translation_vectorIL)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, inner_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformIL, this.materials.line_mat);
+
+        const translation_vectorIR = vec3(18, -1.35, -31); 
+        const rectangle_transformIR = Mat4.translation(...translation_vectorIR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, inner_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformIR, this.materials.line_mat);
+
+        //Draw mid bounds
+        const translation_vectorMR = vec3(40, -1.35, -14.5); 
+        const rectangle_transformMR = Mat4.translation(...translation_vectorMR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, mid_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformMR, this.materials.line_mat);
+
+        const translation_vectorML = vec3(-40, -1.35, -14.5); 
+        const rectangle_transformML = Mat4.translation(...translation_vectorML)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, mid_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformML, this.materials.line_mat);
+
+        //Draw outer bounds
+        const translation_vectorOR = vec3(70, -1.35, 21); 
+        const rectangle_transformOR = Mat4.translation(...translation_vectorOR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, outer_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformOR, this.materials.line_mat);
+
+        const translation_vectorOL = vec3(-70, -1.35, 21); 
+        const rectangle_transformOL = Mat4.translation(...translation_vectorOL)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, outer_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformOL, this.materials.line_mat);
 
         // Create and position the back panel
         const panel_scale = Mat4.scale(panel_width / 2, 5, panel_height / 2);
@@ -417,26 +503,35 @@ export class SoccerShootoutShadows extends Scene {
             let right_hand = goalie_tr.times(Mat4.translation(1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
 
             //draw the goalie
+            if(this.ball.goal){
+                this.shapes.ball.draw(context, program_state, head, shadow_pass? this.materials.face_texture2 : this.pure);
+            }
             this.shapes.ball.draw(context, program_state, head, shadow_pass? this.materials.face_texture : this.pure);
-            this.shapes.ball.draw(context, program_state, left_hand, shadow_pass? this.materials.hands_mat : this.pure);
-            this.shapes.ball.draw(context, program_state, right_hand, shadow_pass? this.materials.hands_mat : this.pure);
-            this.shapes.cylinder.draw(context, program_state, body, shadow_pass? this.materials.body_mat : this.pure);
+            this.shapes.ball.draw(context, program_state, left_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color("#353631")}) : this.pure);
+            this.shapes.ball.draw(context, program_state, right_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color("#353631")}) : this.pure);
+            this.shapes.cylinder.draw(context, program_state, body, shadow_pass? this.materials.body_mat.override({color:hex_color("#FDDA0D")}) : this.pure);
             this.moveGoalie(dt)
 
         }
-
+        //Draw Defenders
         for (let index = 0; index < this.defenders.length; index++){
             this.defenders[index].move(dt)
+            if (this.ball.goal){
+                this.materials.face_texture = this.materials.face_texture2;
+            }
             this.defenders[index].draw(context, program_state, this.shapes, this.materials, shadow_pass)
         }
-
+        //Draw Speed Bumps
         for (let index = 0; index < this.speed_bumps.length; index++){
             this.speed_bumps[index].draw(context, program_state, this.shapes, this.materials, shadow_pass)
         }
-
+        //Draw Ball Chasers
         for (let index = 0; index < this.ball_chasers.length; index++){
             if (this.already_kicked){
                 this.ball_chasers[index].move(dt, this.ball.position)
+            }
+            if (this.ball.goal){
+                this.materials.face_texture = this.materials.face_texture2;
             }
             this.ball_chasers[index].draw(context, program_state, this.shapes, this.materials, shadow_pass)
         }
@@ -483,13 +578,14 @@ export class SoccerShootoutShadows extends Scene {
         if(this.ball.goal){
             if (this.scored_this_possession == null) {
                 this.goals++;
+                this.points+=Math.round((Math.max(1,this.level)*100)/Math.max(this.misses,1));
                 this.misses = 0;
                 this.lost = false;
                 this.scored_this_possession = t;
             }
             if (this.scored_this_possession != null && t - this.scored_this_possession > 3) {
                 this.level += 1
-                this.level = this.level % this.level_obstaces.length
+                this.level = Math.min(this.level, this.level_obstaces.length - 1)
                 this.reset();
             }
         }   
@@ -499,11 +595,17 @@ export class SoccerShootoutShadows extends Scene {
             }
             if (this.missed_this_possession != null && t - this.missed_this_possession > 3) {
                 this.misses += 1;
+                // texteditor.updateLifeCounter(this.misses);
                 if(this.misses > 3){
                     this.lost = true;
                     this.level = 0;
                     this.misses = 0;
+                    this.points = 0;
                     //texteditor.youLose(this.lost);
+                    // document.getElementById('score-container').style.display = 'none';
+                    // document.getElementById('miss-container').style.display = 'none';
+                    // document.getElementById('point-container').style.display = 'none';
+                    // document.getElementById('level-container').style.display = 'none';
                 }
                 this.reset();
             }
@@ -536,7 +638,9 @@ export class SoccerShootoutShadows extends Scene {
         texteditor.updateMisses(this.misses);
         texteditor.updateLevels(this.level)
         texteditor.youLose(this.lost);
+        texteditor.updateLifeCounter(this.misses);
         texteditor.updateScore(this.level);
+        texteditor.updatePoints(this.points);
 
     }
 
@@ -587,6 +691,7 @@ export class SoccerShootoutShadows extends Scene {
         }
 
         // The position of the light
+        //this.light_position = vec4(0, 100, 0, 1);
         this.light_position = Mat4.rotation(t / 1500, 0, 1, 0).times(vec4(30, 6, 1, 1));
         // The color of the light
         this.light_color = color(1,1,1,0);
@@ -596,7 +701,7 @@ export class SoccerShootoutShadows extends Scene {
         this.light_view_target = vec4(0, 0, 0, 1);
         this.light_field_of_view = 300 * Math.PI / 180; // 130 degree
 
-        program_state.lights = [new Light(this.light_position, this.light_color, 3000)];
+        program_state.lights = [new Light(this.light_position, this.light_color, 1000000)];
 
         // Step 1: set the perspective and camera to the POV of light
         const light_view_mat = Mat4.look_at(
