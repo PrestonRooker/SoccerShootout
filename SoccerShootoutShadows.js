@@ -115,6 +115,7 @@ export class SoccerShootoutShadows extends Scene {
             net: new defs.OpenCube(),
             goal: new defs.SoccerGoal(),
             cylinder: new defs.Capped_Cylinder(30, 30),
+            rectangle: new defs.Square(),
         };
 
         this.materials = {
@@ -142,17 +143,26 @@ export class SoccerShootoutShadows extends Scene {
                 light_depth_texture: null,
                 color_texture: new Texture("assets/angry2.png", "LINEAR_MIPMAP_LINEAR")
             }),
+            face_texture2: new Material(new Shadow_Textured_Phong_Shader(1), {
+                color: color(.5, .5, .5, 1), ambient: .3, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                light_depth_texture: null,
+                color_texture: new Texture("assets/angry3.png", "LINEAR_MIPMAP_LINEAR")
+            }),
             post_color: new Material(new Shadow_Textured_Phong_Shader(1), {
                 color: color(.5, .5, .5, 1), ambient: .3, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
                 light_depth_texture: null,
                 color_texture:  hex_color("#FFFFFF")
             }),
             hands_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
-                color: hex_color("#f1c27d"), ambient: .7, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
+                color: hex_color("#a18a68"), ambient: .7, diffusivity: 0.6, specularity: 0.4, smoothness: 64,
                 light_depth_texture: null, 
             }),
             body_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
+<<<<<<< HEAD
                 color: hex_color("#f25003"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 100,
+=======
+                color: hex_color("#8B0000"), ambient: .7, diffusivity: 0.1, specularity: 0.1, smoothness: 64,
+>>>>>>> e207645d927a65529fdd7640d60862866ed6c211
                 light_depth_texture: null
             }),
             speed_bump_mat: new Material(new Shadow_Textured_Phong_Shader(1), {
@@ -387,6 +397,83 @@ export class SoccerShootoutShadows extends Scene {
         const panel_width = 80 / 5; // Same as the crossbar length
         const panel_height = 6; // Same as the post height
 
+        //Draw Field Lines:
+        // this.rectangle_length = 0.1; // Initial length
+        // let rectangle_tr = Mat4.translation(0, -1.4, -39).times(Mat4.scale(70, 0.1, this.rectangle_length)); // Adjust the scale as needed
+        // this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.power_mat);
+        
+        // rectangle_tr = Mat4.translation(0, -1.4, 10).times(Mat4.scale(40, 0.1, this.rectangle_length));
+        // this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.power_mat);
+
+        let rectangle_tr = Mat4.translation(0, -1.4, -23).times(Mat4.scale(18, 0.1, this.rectangle_length));
+        this.shapes.rectangle.draw(context, program_state, rectangle_tr, this.materials.power_mat);
+
+        const width = 0.4;
+        const inner_length = 8;
+        const mid_length = 24.5;
+        const outer_length = 60;
+        const rotation_angle = Math.PI / 2;
+
+        //Draw Horizontal Lines
+        const translation_vectorH1 = vec3(0, -1.3, -39); 
+        const rectangle_transformH1 = Mat4.translation(...translation_vectorH1)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.rotation(rotation_angle, 0, 0, 1))
+            .times(Mat4.scale(0.5, 70, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformH1, this.materials.power_mat);
+
+        const translation_vectorH2 = vec3(0, -1.3, 10); 
+        const rectangle_transformH2 = Mat4.translation(...translation_vectorH2)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))  // Rotate about the x-axis
+            .times(Mat4.rotation(rotation_angle, 0, 0, 1))  // Rotate about the z-axis
+            .times(Mat4.scale(0.5, 40, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformH2, this.materials.power_mat);
+        
+        const translation_vectorH3 = vec3(0, -1.3, -23); 
+        const rectangle_transformH3 = Mat4.translation(...translation_vectorH3)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.rotation(rotation_angle, 0, 0, 1))
+            .times(Mat4.scale(0.5, 18, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformH3, this.materials.power_mat);
+
+        //Draw inner bounds
+        const translation_vectorIL = vec3(-18, -1.35, -31); 
+        const rectangle_transformIL = Mat4.translation(...translation_vectorIL)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, inner_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformIL, this.materials.power_mat);
+
+        const translation_vectorIR = vec3(18, -1.35, -31); 
+        const rectangle_transformIR = Mat4.translation(...translation_vectorIR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, inner_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformIR, this.materials.power_mat);
+
+        //Draw mid bounds
+        const translation_vectorMR = vec3(40, -1.35, -14.5); 
+        const rectangle_transformMR = Mat4.translation(...translation_vectorMR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, mid_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformMR, this.materials.power_mat);
+
+        const translation_vectorML = vec3(-40, -1.35, -14.5); 
+        const rectangle_transformML = Mat4.translation(...translation_vectorML)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, mid_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformML, this.materials.power_mat);
+
+        //Draw outer bounds
+        const translation_vectorOR = vec3(70, -1.35, 21); 
+        const rectangle_transformOR = Mat4.translation(...translation_vectorOR)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, outer_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformOR, this.materials.power_mat);
+
+        const translation_vectorOL = vec3(-70, -1.35, 21); 
+        const rectangle_transformOL = Mat4.translation(...translation_vectorOL)
+            .times(Mat4.rotation(rotation_angle, 1, 0, 0))
+            .times(Mat4.scale(width, outer_length, 1));
+        this.shapes.rectangle.draw(context, program_state, rectangle_transformOL, this.materials.power_mat);
 
         // Create and position the back panel
         const panel_scale = Mat4.scale(panel_width / 2, 5, panel_height / 2);
@@ -418,26 +505,35 @@ export class SoccerShootoutShadows extends Scene {
             let right_hand = goalie_tr.times(Mat4.translation(1.5,0,4).times(Mat4.scale(0.5,0.5,0.5)).times(Mat4.identity()));
 
             //draw the goalie
+            if(this.ball.goal){
+                this.shapes.ball.draw(context, program_state, head, shadow_pass? this.materials.face_texture2 : this.pure);
+            }
             this.shapes.ball.draw(context, program_state, head, shadow_pass? this.materials.face_texture : this.pure);
-            this.shapes.ball.draw(context, program_state, left_hand, shadow_pass? this.materials.hands_mat : this.pure);
-            this.shapes.ball.draw(context, program_state, right_hand, shadow_pass? this.materials.hands_mat : this.pure);
-            this.shapes.cylinder.draw(context, program_state, body, shadow_pass? this.materials.body_mat : this.pure);
+            this.shapes.ball.draw(context, program_state, left_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color('#505050')}) : this.pure);
+            this.shapes.ball.draw(context, program_state, right_hand, shadow_pass? this.materials.hands_mat.override({color:hex_color('#505050')}) : this.pure);
+            this.shapes.cylinder.draw(context, program_state, body, shadow_pass? this.materials.body_mat.override({color:hex_color("#DFFF00")}) : this.pure);
             this.moveGoalie(dt)
 
         }
-
+        //Draw Defenders
         for (let index = 0; index < this.defenders.length; index++){
             this.defenders[index].move(dt)
+            if (this.ball.goal&&this.already_kicked){
+                this.materials.face_texture = this.materials.face_texture2;
+            }
             this.defenders[index].draw(context, program_state, this.shapes, this.materials, shadow_pass)
         }
-
+        //Draw Speed Bumps
         for (let index = 0; index < this.speed_bumps.length; index++){
             this.speed_bumps[index].draw(context, program_state, this.shapes, this.materials, shadow_pass)
         }
-
+        //Draw Ball Chasers
         for (let index = 0; index < this.ball_chasers.length; index++){
             if (this.already_kicked){
                 this.ball_chasers[index].move(dt, this.ball.position)
+            }
+            if (this.ball.goal&&this.already_kicked){
+                this.materials.face_texture = this.materials.face_texture2;
             }
             this.ball_chasers[index].draw(context, program_state, this.shapes, this.materials, shadow_pass)
         }
