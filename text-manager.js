@@ -20,15 +20,19 @@ export function updateMisses(value) {
     missElement.textContent = `Misses: ${value}`;
 }
 
-export function updateLifeCounter(lives) {
-    const lifeContainer = document.getElementById('life-container');
-    lifeContainer.innerHTML = ""; // Clear existing hearts
+export function updateLifeCounter(misses) {
+    const heart_elements = document.getElementsByClassName('heart');
+    const totalHearts = heart_elements.length;
 
-    for (let i = 0; i < 3-lives; i++) {
-        const heartImg = document.createElement("img");
-        heartImg.src = "assets/heart.png"; // Replace with the actual path to your heart image
-        heartImg.alt = "Heart";
-        lifeContainer.append(heartImg);
+    for (let i = 0; i < totalHearts; i++) {
+        const heart = heart_elements[i];
+        const isVisible = i >= totalHearts - misses;
+
+        if (isVisible) {
+            heart.style.opacity = '0.3';
+        } else {
+            heart.style.opacity = '1';
+        }
     }
 }
 

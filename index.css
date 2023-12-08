@@ -62,12 +62,14 @@ html, body {
 }
 
 img{
-    width: 40px; /* Adjust the width as needed */
-    height: 40px; /* Adjust the height as needed */
+    width: 45px; /* Adjust the width as needed */
+    height: 45px; /* Adjust the height as needed */
     max-width: 100%; /* Ensure the image doesn't exceed its natural size */
     margin-right: 20px; /* Optional margin between hearts */
     display: inline-block; /* Ensure hearts are displayed in a line */
-    filter: brightness(100%); /* Optional: Adjust brightness for a subtle effect */
+    /* filter: brightness(100%); Optional: Adjust brightness for a subtle effect */
+    background-color: #ff0000; /* Adjust the color as needed */
+    border-radius: 50%; /* Optional: Make the background a circle */
 }
 
 #point-container {
