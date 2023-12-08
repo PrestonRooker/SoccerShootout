@@ -6,6 +6,9 @@ const gravity = 20;
 
 export default class Ball {
     constructor(initialPosition) {
+        this.goal_sound = new Audio('assets/goal.mp3')
+        this.collision_sound = new Audio('assets/collision.wav')
+        this.collision_sound.volume = 0.6;
         this.reset(initialPosition);
     }
 
@@ -56,7 +59,14 @@ export default class Ball {
 
         if (this.goal) {
             console.log("GOOOOOAAAAALLLLL")
+            if(!this.playing_goal_sound){
+                this.goal_sound.play()
+                this.playing_goal_sound = true
+            }
             // console.log(this.position)
+        }
+        else{
+            this.playing_goal_sound = false
         }
 
         let collided_face = {};
@@ -64,6 +74,9 @@ export default class Ball {
             const collision = this.getCollision(obs);
             if (collision == null)
                 continue;
+
+            this.collision_sound.play()
+
             collided_face = collision.face;
             
             // console.log(collision.direction, collision.distance, collision.face.i);
