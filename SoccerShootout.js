@@ -247,7 +247,7 @@ export class SoccerShootout extends Scene {
 
         //Draw power meter circle
         let power_tr = Mat4.scale(r, r, r).times(Mat4.identity());
-        power_tr = Mat4.translation(0, -0.9, 0).times(Mat4.rotation(Math.PI/2,1,0,0)).times(power_tr);
+        power_tr = Mat4.translation(0, -0.89, 0).times(Mat4.rotation(Math.PI/2,1,0,0)).times(power_tr);
         const r_n = r/2; 
         const red = r_n;
         const green = 1-r_n;
