@@ -32,27 +32,41 @@ cd SoccerShootout
 
 ## Key features
 
-- Texture mapping
-- Level 
-- 3D ball physics
-  - Dynamics
-  - Friction
-  - Collision detection and resolution
-- Shadowing
+#### Ball dynamics and friction
+The soccer ball's motion is modeled using kinematic equations and experiences
+negative y-acceleration. When the ball is kicked, it is given an initial
+velocity and angle based on shot power and aim. While it is rolling on the
+ground, the ball experiences deceleration against the direction of motion. We
+also simulate rolling of the ball based on its x- and z-velocity.
 
-Leveling System: The leveling system is comprised of the number
-and types of obstacles that a player will face. Each time a goal is
-scored a new obstacle is added to the overall collection of obstacles
-in their path. This allows for the game to have scaling difficulty as
-they player proceeds through the levels. If a player misses 4 times in a 
-level, they are forced back to the first level and must climb again.
+#### Collision detection and resolution
+The ball collides with the ground, obstacles and defenders. We model each object
+with a collider; for each face on the collider, we check if it contacts the
+ball, and if so a collision is generated. To resolve collisions, we reflect the
+velocity of the ball against the vector of collision, reducing its momentum due
+to inelasticity. To ensure accurate collisions, the ball's motion is updated
+several times per frame.
 
-Shadowing: To acheive shadowing, we do two passes when drawing every object.
-The first pass draws the object itself and the second pass draws a secondary
-shadow object next to the first. In order to determine the size and shape, a
-shader is implemented which takes in the poition of an object relative to the
-position of an individual light source and calculates the size and shape of the
-shadow which morphs as the light moves.
+#### Leveling system
+The leveling system is comprised of the number and types of obstacles that a
+player will face. Each time a goal is scored a new obstacle is added to the
+overall collection of obstacles in their path. This allows for the game to have
+scaling difficulty as they player proceeds through the levels. If a player
+misses 4 times in a level, they are forced back to the first level and must
+climb again.
+
+#### Shadowing
+To achieve shadowing, we do two passes when drawing every object. The first pass
+draws the object itself and the second pass draws a secondary shadow object next
+to the first. In order to determine the size and shape, a shader is implemented
+which takes in the position of an object relative to the position of an
+individual light source and calculates the size and shape of the shadow which
+morphs as the light moves.
+
+#### Audio and visual feedback
+We used collision-triggered audio along with an epic soundtrack to immerse
+players in the game. Players can also see the current state of the game, like
+points or lives, through a HUD and receive visual feedback when they score.
 
 ## Attributions
 
