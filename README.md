@@ -33,12 +33,26 @@ cd SoccerShootout
 ## Key features
 
 - Texture mapping
-- Level system
+- Level 
 - 3D ball physics
   - Dynamics
   - Friction
   - Collision detection and resolution
 - Shadowing
+
+Leveling System: The leveling system is comprised of the number
+and types of obstacles that a player will face. Each time a goal is
+scored a new obstacle is added to the overall collection of obstacles
+in their path. This allows for the game to have scaling difficulty as
+they player proceeds through the levels. If a player misses 4 times in a 
+level, they are forced back to the first level and must climb again.
+
+Shadowing: To acheive shadowing, we do two passes when drawing every object.
+The first pass draws the object itself and the second pass draws a secondary
+shadow object next to the first. In order to determine the size and shape, a
+shader is implemented which takes in the poition of an object relative to the
+position of an individual light source and calculates the size and shape of the
+shadow which morphs as the light moves.
 
 ## Attributions
 
