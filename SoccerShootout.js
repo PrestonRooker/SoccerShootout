@@ -76,6 +76,7 @@ export class SoccerShootout extends Scene {
         this.background_music.loop = true;
         this.has_music_started_playing = false;
         this.mute = false;
+        this.goals = 0;
 
         this.dimensions = [0, 0];
         this.arrow_ang_x = 0
@@ -606,7 +607,7 @@ export class SoccerShootout extends Scene {
         texteditor.updateLevels(this.level)
         texteditor.youLose(this.lost);
         texteditor.updateLifeCounter(this.misses);
-        texteditor.updateScore(this.level);
+        texteditor.updateScore(this.goals);
         texteditor.updatePoints(this.points);
 
     }
