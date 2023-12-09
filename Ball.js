@@ -14,7 +14,6 @@ export default class Ball {
 
     reset(initialPosition){
         this.position = initialPosition;
-        this.prev_position = initialPosition;
         this.velocity = vec4(0, 0, 0, 0);
         this.radius = 1;
         this.goal = false;
@@ -22,7 +21,6 @@ export default class Ball {
         this.roll_ang_x = 0
         this.roll_ang_z = 0
         this.roll_sp = 0
-        this.playing_goal_sound = false
     }
 
     roll(dt){
@@ -35,7 +33,7 @@ export default class Ball {
     }
 
     update(dt, obstacle_transforms, restitution_coefs) {
-        this.prev_position = this.position;
+
         this.velocity = this.velocity.plus(vec4(0, -gravity, 0, 0).times(dt));
         this.position = this.position.plus(this.velocity.times(dt));
 
@@ -69,7 +67,6 @@ export default class Ball {
         }
         else{
             this.playing_goal_sound = false
-
         }
 
         let collided_face = {};
@@ -78,25 +75,10 @@ export default class Ball {
             if (collision == null)
                 continue;
 
-            
             this.collision_sound.play()
-            
+
             collided_face = collision.face;
             
-            const similarity = cosineSimilarity(collision.direction, this.velocity);
-            console.log("Cosine similarity:", similarity);
-
-            // // Check if vectors have almost the same direction
-            const threshold = 0.95; // You can adjust this threshold
-            if (similarity !== null && similarity >= threshold) {
-                console.log("Collision vector and velocity vector have almost the same direction.");
-                console.log("Setting collision direction to opposite");
-                console.log(collision.direction)
-                reverseDirection(collision.direction)
-                console.log(collision.direction)
-            }
-
-
             // console.log(collision.direction, collision.distance, collision.face.i);
             this.position = this.position.plus(collision.direction.times(collision.distance));
 
@@ -142,10 +124,8 @@ export default class Ball {
         [obstacle_transform.times(points[0]), obstacle_transform.times(points[0])]);
 
         const sphereBoundingBox = [this.position.minus(vec4(1, 1, 1, 0)), this.position.plus(vec4(1, 1, 1, 0))];
-        if (!doAxisAlignedBoundingBoxesCollide(sphereBoundingBox, obstacleBoundingBox)){
+        if (!doAxisAlignedBoundingBoxesCollide(sphereBoundingBox, obstacleBoundingBox))
             return null;
-        }
-        console.log("regular collide");        
 
         const faces = [
             [0, 1, 3, 2],
@@ -206,7 +186,6 @@ export default class Ball {
             }
             i++;
         }
-        console.log("minimum:",minimum)
         return minimum;
     }
 
@@ -219,11 +198,6 @@ function zip(a, b) {
     return a.map(function(el, i) {
         return [el, b[i]];
     });
-}
-
-//Finds the position halfway between a and b
-function halfway_position(a, b){
-    return vec4((a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2,1)
 }
 
 // A bounding box should be an array of two points
@@ -239,33 +213,4 @@ function projectPointOntoLine(point, a, b) {
     const ap = point.minus(a);
     const projectedVector = ab.times(ap.dot(ab) / ab.dot(ab));
     return a.plus(projectedVector);
-}
-
-
-// Function to calculate the magnitude of a vector
-function magnitude(vector) {
-    let sum = 0;
-    for (let i = 0; i < vector.length; i++) {
-        sum += vector[i] * vector[i];
-    }
-    return Math.sqrt(sum);
-}
-
-// Function to calculate the cosine similarity between two vectors
-function cosineSimilarity(vector1, vector2) {
-    const dotProd = vector1.dot(vector2);
-    const mag1 = magnitude(vector1);
-    const mag2 = magnitude(vector2);
-    
-    if (mag1 === 0 || mag2 === 0) {
-        return null; // Handle division by zero
-    }
-
-    return dotProd / (mag1 * mag2);
-}
-
-function reverseDirection(vec){
-    vec[0] = -vec[0];
-    vec[1] = -vec[1];
-    vec[2] = -vec[2];
 }
