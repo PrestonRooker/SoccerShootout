@@ -8,8 +8,8 @@ const domeRadius = 300;
 
 import {Color_Phong_Shader, Shadow_Textured_Phong_Shader,
      Buffered_Texture, LIGHT_DEPTH_TEX_SIZE} from './shadow-demo-shaders.js'
-import Ball from './BallShadows.js';
-import { Defender, Ball_Chaser, Speed_Bump } from './DefenderShadows.js';
+import Ball from './Ball.js';
+import { Defender, Ball_Chaser, Speed_Bump } from './Defender.js';
 import * as texteditor from './text-manager.js';
 
 
